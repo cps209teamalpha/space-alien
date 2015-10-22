@@ -15,6 +15,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 //this is a delete
+//Is it really?
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
