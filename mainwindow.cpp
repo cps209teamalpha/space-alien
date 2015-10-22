@@ -48,3 +48,4 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         break;
     }
 }
+    //To(DO) Italo: Stuffs.
