@@ -47,4 +47,4 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         break;
     }
 }
-    //To(DO) Italo: Stuffs.
+    //To(DO) Italo: Stuffs. I do not even lift, bro. Like, for real?
