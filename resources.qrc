@@ -9,9 +9,7 @@
         <file>images/alien6.png</file>
         <file>images/alien7.png</file>
         <file>images/asteroid.png</file>
-=======
         <file>images/space.jpg</file>
         <file>images/logo.png</file>
->>>>>>> 6bb8e0b7da8e4b6e7d317be34504eaca010fd8b9
     </qresource>
 </RCC>
