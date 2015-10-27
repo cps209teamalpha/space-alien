@@ -60,14 +60,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::on_pushButton_clicked()
 {
-    auto label_left = random_int(0, this->geometry().width() - 32);
-    auto label_top = random_int(ui->pushButton->geometry().bottom(),
-                   this->geometry().height() - 32);
+    int num_enemy = 5;
 
-    Enemy *alien = new Enemy(ui->centralWidget);
-    QPixmap evil(":/images/asteroid.png");
-    alien->setPixmap(evil);
-    alien->setGeometry(QRect(label_left, label_top, 32, 32));
-    alien->setScaledContents(true);
-    alien->show();
-}
+    ui->pushButton->setHidden(true);
+
+    for (int i = 0; i < num_enemy; ++i)
+    {
+        auto label_left = random_int(0, this->geometry().width() - 32);
+        auto label_top = random_int(ui->pushButton->geometry().bottom(),
+                       this->geometry().height() - 32);
+
+        Enemy *alien = new Enemy(ui->centralWidget);
+        QPixmap evil(":/images/asteroid.png");
+        alien->setPixmap(evil);
+        alien->setGeometry(QRect(label_left, label_top, 32, 32));
+        alien->setScaledContents(true);
+        alien->show();
+    }
+} //Will generate enemies for you
