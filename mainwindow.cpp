@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "enemyspawn.h"
 
 #include <QKeyEvent>
 #include <QDebug>

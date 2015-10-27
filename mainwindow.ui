@@ -73,7 +73,7 @@ selection-color: rgb(0, 255, 0);
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="resources.qrc">:/images/logo.png</pixmap>
+     <pixmap>:/images/logo.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -86,7 +86,7 @@ selection-color: rgb(0, 255, 0);
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>
