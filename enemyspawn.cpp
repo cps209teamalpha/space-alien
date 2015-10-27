@@ -6,12 +6,6 @@
 
 using namespace std;
 
-int random_int(int min, int max) {
-    static std::default_random_engine engine { std::random_device{}() };
-    std::uniform_int_distribution<int> distro{min, max};
-    return distro(engine);
-}
-
 void enemyGen()
 {
     /*auto label_left = random_int(0, this->geometry().width() - 32);
