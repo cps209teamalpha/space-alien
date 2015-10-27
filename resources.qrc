@@ -1,13 +1,17 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/59vgvb.jpg</file>
-        <file>images/alien.jpg</file>
-        <file>images/alien (1).jpg</file>
-        <file>images/alien (2).jpg</file>
-        <file>images/alien (3).jpg</file>
-        <file>images/alien (4).jpg</file>
         <file>images/spaceship.png</file>
+        <file>images/alien1.png</file>
+        <file>images/alien2.png</file>
+        <file>images/alien3.png</file>
+        <file>images/alien4.png</file>
+        <file>images/alien5.png</file>
+        <file>images/alien6.png</file>
+        <file>images/alien7.png</file>
+        <file>images/asteroid.png</file>
+=======
         <file>images/space.jpg</file>
         <file>images/logo.png</file>
+>>>>>>> 6bb8e0b7da8e4b6e7d317be34504eaca010fd8b9
     </qresource>
 </RCC>
