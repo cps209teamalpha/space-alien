@@ -7,5 +7,7 @@
         <file>images/alien (3).jpg</file>
         <file>images/alien (4).jpg</file>
         <file>images/spaceship.png</file>
+        <file>images/space.jpg</file>
+        <file>images/logo.png</file>
     </qresource>
 </RCC>
