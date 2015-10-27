@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "player.h"
+
 using namespace std;
 
 class SavableObject
@@ -17,7 +19,6 @@ public:
 // Because there will only be one game running in a single program, the
 // class lends itself to being a Singleton.
 
-class Player;
 class Highscores;
 
 class Game : SavableObject
@@ -37,6 +38,9 @@ public:
     // Updates player & enemies, for use with a timer
     void updateField();
 
+    // For debug purposes only:
+    Player *getPlayer() { return players[0]; }
+
     // Methods to save/load game.
     // Talk to Mr. J about necessity of these
     // Reads file and instantiates member variables with the info
@@ -52,42 +56,6 @@ private:
     static Game *instance_;
 public:
     static Game *instance();
-};
-
-// The player class. In mp mode, there
-// will be multiple player objects, so
-// we may as well make it an object from
-// the start.
-
-class Player
-{
-private:
-    int rotation, x, y; // rotation = direction ship is pointing (360 degrees) x, y = current ship loc
-    int speed; // the current speed the ship is traveling at (may be rewritten)
-public:
-    Player(int startX, int startY): x(startX), y(startY) { }
-
-    // Updates the player's position based on speed and direction
-    void move();
-    // Rotates the ship to the left
-    void turnLeft();
-    // Rotates the ship to the right
-    void turnRight();
-    // Increases the ship's speed
-    void accelerate();
-    // Decreases the ship's speed
-    void decelerate();
-
-    // Save/load methods. Again, not
-    // sure how appropriate this is
-    // to our game concept.
-    //void load();
-    //void save();
-    // Could not make Player inherit from SavableObject.
-    // Kept complaining about 'undefined reference to vtable'
-    // Because SavableObject has no constructor that takes
-    // two ints.
-    // How to fix this???
 };
 
 class Highscores : SavableObject
