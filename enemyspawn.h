@@ -15,13 +15,17 @@ class Enemy : public QLabel
 
 public:
 
-    explicit Enemy(QWidget *parent): QLabel(parent) {
+    int dX, dY;
 
+    explicit Enemy(QWidget *parent, int initX, int initY): QLabel(parent) {
+
+       dX = initX;
+       dY = initY;
     }
 
 
-//add some fun stuff here!
-
+ int getDeltaX() { return dX; }
+ int getDeltaY() { return dY; }
 
 };
 //Enemy Class
