@@ -9,7 +9,19 @@ using namespace std;
 // Updates the player's position based on speed and direction
 void Player::move()
 {
-
+    double yInc;
+    if (angle >= 90 && angle <= 270)
+    {
+        yInc = sqrt(speed + (speed * sin(angle * M_PI / 180)));
+    }
+    else
+    {
+        yInc = -1 * sqrt(speed - (speed * sin(angle * M_PI / 180)));
+    }
+    double xInc = speed * sin(angle * M_PI / 180);
+    // qDebug() << "Angle: " << angle << "(sin " << sin(angle * M_PI / 180) << ") yInc: " << yInc << "xInc: " << xInc << endl;
+    x += xInc;
+    y += yInc;
 }
 
 // Rotates the ship to the left
@@ -35,6 +47,19 @@ void Player::turnRight()
 // Increases the ship's speed
 void Player::accelerate()
 {
+    // A simplification of the method.
+    // This will cancel the ship's velocity and
+    // replace it with an accelerated velocity in
+    // the direction the ship is facing.
+    // The finished product will calculate a new
+    // angle in between the last angle and the
+    // the current rotation, factoring in how fast
+    // you were traveling in the previous direction
+    // and implement angle and speed accordingly.
+    speed++;
+    if (speed > 15)
+        speed = 15;
+    angle = rotation;
     /*if (speed == 0)
     {
         angle = rotation;
@@ -45,28 +70,21 @@ void Player::accelerate()
         // Ship is already moving; do calculations to change the
         // angle of the drift and add speed in a new direction
     }*/
-
-    // This code (minus testing bits) will actually go in the move() method
-    // in the final game.
-    int tempSpeed = 5; // A sample test speed
-    int theta = rotation;
-    double yInc;
-    if (rotation >= 90 && rotation <= 270)
-    {
-        yInc = sqrt(tempSpeed + (tempSpeed * sin(theta * M_PI / 180)));
-    }
-    else
-    {
-        yInc = -1 * sqrt(tempSpeed - (tempSpeed * sin(theta * M_PI / 180)));
-    }
-    double xInc = tempSpeed * sin(theta * M_PI / 180);
-    // qDebug() << "Theta: " << theta << "(sin " << sin(theta * M_PI / 180) << ") yInc: " << yInc << "xInc: " << xInc << endl;
-    x += xInc;
-    y += yInc;
 }
 
 // Decreases the ship's speed
 void Player::decelerate()
 {
-
+    // Not sure yet if this will
+    // simply reduce the speed
+    // variable or if it will
+    // apply a stopping force
+    // in the opposite direction
+    // from the one the ship is facing in
+    // (i.e., a ship traveling southwest and
+    // facing west will end up only traveling
+    // south).
+    speed--;
+    if (speed < 0)
+        speed = 0;
 }

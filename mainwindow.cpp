@@ -42,6 +42,20 @@ void PlayerLabel::rotate(int angle)
     setPixmap(pixmap);
 }
 
+void MainWindow::timerHit()
+{
+    Game::instance()->updateField();
+    QObjectList objList = ui->centralWidget->children();
+    for (QObject *lbl : objList)
+    {
+        PlayerLabel *lblPlayer = dynamic_cast<PlayerLabel *>(lbl);
+        if (lblPlayer != nullptr)
+        {
+            lblPlayer->move(lblPlayer->getPlayer()->getX(), lblPlayer->getPlayer()->getY());
+        }
+    }
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     QObjectList objList = ui->centralWidget->children();
@@ -53,13 +67,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             switch (event->key())
             {
             case Qt::Key_Up:
-                Game::instance()->getPlayer()->accelerate();
-                if ((Game::instance()->getPlayer()->getX() >= 0) && (Game::instance()->getPlayer()->getY() >= 0))
-                {
-                    lblPlayer->move(Game::instance()->getPlayer()->getX(), Game::instance()->getPlayer()->getY());
-                }
+                lblPlayer->getPlayer()->accelerate();
                 break;
             case Qt::Key_Down:
+                lblPlayer->getPlayer()->decelerate();
                 qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," << Game::instance()->getPlayer()->getY() << ") traveling at " << Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " << Game::instance()->getPlayer()->getAngle() << " rotated " << Game::instance()->getPlayer()->getRot() << " degrees." << endl;
                 break;
             case Qt::Key_Left:
@@ -115,4 +126,9 @@ void MainWindow::on_btnPlay_clicked()
     lblPlayer->setScaledContents(true);
     lblPlayer->show();
     lblPlayer->setFocus();
+
+    // Initialize timer:
+    timer->setInterval(100);
+    connect(timer, SIGNAL(timeout()), this, SLOT(timerHit()));
+    timer->start();
 }
