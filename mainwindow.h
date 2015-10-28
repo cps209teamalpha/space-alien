@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QLabel>
+#include <QTimer>
 
 #include "player.h"
 
@@ -14,6 +15,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    QTimer *timer = new QTimer(this);
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -21,6 +24,8 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 private slots:
+    void timerHit();
+
     void on_btnPlay_clicked();
 
 private:

@@ -1,5 +1,6 @@
 #include <vector>
 #include "game.h"
+#include "player.h"
 
 using namespace std;
 
@@ -21,7 +22,10 @@ void Game::newGame()
 // Updates player & enemies, for use with a timer
 void Game::updateField()
 {
-
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        players[i]->move();
+    }
 }
 
 // Methods to save/load game.
