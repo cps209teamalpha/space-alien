@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QLabel>
+
+#include "player.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,10 +21,43 @@ public:
     void keyPressEvent(QKeyEvent *event);
 
 private slots:
-    void on_pushButton_clicked();
+    void on_btnPlay_clicked();
 
 private:
     Ui::MainWindow *ui;
+};
+
+// A basic QLabel that also contains a pointer to
+// a player object and an original pixmap (for
+// rotation purposes)
+class PlayerLabel : public QLabel
+{
+    Q_OBJECT
+
+    Player *myPlayer;
+
+    QPixmap *orig_pixmap;
+
+public:
+    explicit PlayerLabel(QWidget *parent): QLabel(parent) {
+        if (this->pixmap() != nullptr)
+        {
+            orig_pixmap = new QPixmap(*this->pixmap());
+        }
+    }
+
+    Player *getPlayer() { return myPlayer; }
+    void setPlayer(Player *player) { myPlayer = player; }
+    void setOrigPixmap(QPixmap &pixmap) { orig_pixmap = new QPixmap(pixmap); }
+
+    ~PlayerLabel()
+    {
+        delete myPlayer;
+        delete orig_pixmap;
+    }
+
+    void rotate(int angle);
+
 };
 
 #endif // MAINWINDOW_H

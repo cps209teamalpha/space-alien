@@ -39,7 +39,7 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="btnPlay">
     <property name="geometry">
      <rect>
       <x>300</x>
@@ -60,7 +60,7 @@ selection-color: rgb(0, 255, 0);
      <string>PLAY</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="lblTitle">
     <property name="geometry">
      <rect>
       <x>10</x>

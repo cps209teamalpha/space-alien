@@ -19,5 +19,3 @@ void enemyGen()
     alien->setScaledContents(true);
     alien->show(); */
 }
-
-

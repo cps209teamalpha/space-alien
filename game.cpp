@@ -8,7 +8,7 @@ using namespace std;
 Game::Game()
 {
     highscores = new Highscores();
-    players.push_back(new Player(100, 100));
+    players.push_back(new Player(380, 190));
 }
 
 // Wipes the current game and reinstantiates
@@ -57,44 +57,6 @@ Game *Game::instance()
         instance_ = new Game();
     }
     return instance_;
-}
-
-// Updates the player's position based on speed and direction
-void Player::move()
-{
-
-}
-
-// Rotates the ship to the left
-void Player::turnLeft()
-{
-    rotation--;
-    if (rotation < 0)
-    {
-        rotation = 359;
-    }
-}
-
-// Rotates the ship to the right
-void Player::turnRight()
-{
-    rotation++;
-    if (rotation > 359)
-    {
-        rotation = 0;
-    }
-}
-
-// Increases the ship's speed
-void Player::accelerate()
-{
-
-}
-
-// Decreases the ship's speed
-void Player::decelerate()
-{
-
 }
 
 // Default constructor for Highscore object

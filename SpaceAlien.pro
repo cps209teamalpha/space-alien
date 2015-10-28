@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     game.cpp \
+    player.cpp \
     enemyspawn.cpp
 
 HEADERS  += mainwindow.h \
     game.h \
+    player.h \
     enemyspawn.h
 
 FORMS    += mainwindow.ui

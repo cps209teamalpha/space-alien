@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/spaceship.png</file>
         <file>images/alien1.png</file>
         <file>images/alien2.png</file>
         <file>images/alien3.png</file>
@@ -9,7 +8,8 @@
         <file>images/alien6.png</file>
         <file>images/alien7.png</file>
         <file>images/asteroid.png</file>
-        <file>images/space.jpg</file>
         <file>images/logo.png</file>
+        <file>images/space.jpg</file>
+        <file>images/spaceship.png</file>
     </qresource>
 </RCC>
