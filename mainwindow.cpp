@@ -54,6 +54,17 @@ void MainWindow::timerHit()
             lblPlayer->move(lblPlayer->getPlayer()->getX(), lblPlayer->getPlayer()->getY());
         }
     }
+
+   for (QObject *lbl : objList)
+   {
+       Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
+       if (lblEnemy != nullptr)
+       {
+           int deltaX = lblEnemy->getDeltaX();
+           int deltaY = lblEnemy->getDeltaY();
+           lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
+       }
+   }//Moves Enemies
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -100,7 +111,7 @@ void MainWindow::on_btnPlay_clicked()
     ui->btnPlay->hide();
 
     // Enemy set-up
-    int num_enemy = 5;
+    int num_enemy = 5; //This amount for level 1 and PoC purposes
 
     for (int i = 0; i < num_enemy; ++i)
     {
@@ -108,7 +119,7 @@ void MainWindow::on_btnPlay_clicked()
         auto label_top = random_int(ui->btnPlay->geometry().bottom(),
                        this->geometry().height() - 32);
 
-        Enemy *alien = new Enemy(ui->centralWidget);
+        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
         QPixmap evil(":/images/asteroid.png");
         alien->setPixmap(evil);
         alien->setGeometry(QRect(label_left, label_top, 32, 32));
