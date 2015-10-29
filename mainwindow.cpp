@@ -34,11 +34,30 @@ void PlayerLabel::rotate(int angle)
 {
     QTransform rotate_label;
 
-    rotate_label.translate(((orig_pixmap->width() - width()) / 2), ((orig_pixmap->width() - height()) / 2));
     rotate_label.rotate(angle, Qt::ZAxis);
 
     QPixmap pixmap;
     pixmap = orig_pixmap->transformed(rotate_label, Qt::SmoothTransformation);
+
+    // Code to scale the image appropriately as
+    // it rotates
+/*    int newWidth;
+    int newHeight;
+    int imageAngle = myPlayer->getRot();
+
+    if (myPlayer->getRot() < 90)
+    {
+        newWidth = (int)round((orig_pixmap->width() * sin(90 - imageAngle)) + (orig_pixmap->height() * sin(imageAngle)));
+        newHeight = (int)round((orig_pixmap->width() * sin(imageAngle)) + (orig_pixmap->height() * sin(90 - imageAngle)));
+    }
+    else if (myPlayer->getAngle() > 270)
+    {
+        imageAngle = 360 - imageAngle;
+        newWidth = (int)round((orig_pixmap->width() * sin(90 - imageAngle)) + (orig_pixmap->height() * sin(imageAngle)));
+        newHeight = (int)round((orig_pixmap->width() * sin(imageAngle)) + (orig_pixmap->height() * sin(90 - imageAngle)));
+    }
+    setGeometry(this->x(), this->y(), newWidth, newHeight);*/
+
     setPixmap(pixmap);
 }
 
@@ -52,23 +71,39 @@ void MainWindow::timerHit()
         if (lblPlayer != nullptr)
         {
             lblPlayer->move(lblPlayer->getPlayer()->getX(), lblPlayer->getPlayer()->getY());
+            if (upKeyPressed)
+            {
+                lblPlayer->getPlayer()->accelerate();
+            }
+            if (downKeyPressed)
+            {
+                lblPlayer->getPlayer()->decelerate();
+            }
+            if (leftKeyPressed)
+            {
+                Game::instance()->getPlayer()->turnLeft();
+                lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+            }
+            if (rightKeyPressed)
+            {
+                Game::instance()->getPlayer()->turnRight();
+                lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+            }
+        }
+        Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
+        if (lblEnemy != nullptr)
+        {
+            int deltaX = lblEnemy->getDeltaX();
+            int deltaY = lblEnemy->getDeltaY();
+            lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
         }
     }
-
-   for (QObject *lbl : objList)
-   {
-       Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
-       if (lblEnemy != nullptr)
-       {
-           int deltaX = lblEnemy->getDeltaX();
-           int deltaY = lblEnemy->getDeltaY();
-           lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
-       }
-   }//Moves Enemies
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
+    // Get rid of these unnecessary functions
+    // once we remove the qDebug() message.
     QObjectList objList = ui->centralWidget->children();
     for (QObject *lbl : objList)
     {
@@ -78,24 +113,43 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             switch (event->key())
             {
             case Qt::Key_Up:
-                lblPlayer->getPlayer()->accelerate();
+                upKeyPressed = true;
                 break;
             case Qt::Key_Down:
-                lblPlayer->getPlayer()->decelerate();
+                downKeyPressed = true;
                 qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," << Game::instance()->getPlayer()->getY() << ") traveling at " << Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " << Game::instance()->getPlayer()->getAngle() << " rotated " << Game::instance()->getPlayer()->getRot() << " degrees." << endl;
                 break;
             case Qt::Key_Left:
-                Game::instance()->getPlayer()->turnLeft();
-                lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                leftKeyPressed = true;
                 break;
             case Qt::Key_Right:
-                Game::instance()->getPlayer()->turnRight();
-                lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                rightKeyPressed = true;
                 break;
             default:
                 break;
             }
         }
+    }
+}
+
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+    case Qt::Key_Up:
+        upKeyPressed = false;
+        break;
+    case Qt::Key_Down:
+        downKeyPressed = false;
+        break;
+    case Qt::Key_Left:
+        leftKeyPressed = false;
+        break;
+    case Qt::Key_Right:
+        rightKeyPressed = false;
+        break;
+    default:
+        break;
     }
 }
 // Matt: Brethen, doest thou participate in the act of the separation of large mass from the earth against its gravitational influence, for the ideal purpose of increasing muscle volume and the burning of the chubs?
@@ -139,7 +193,7 @@ void MainWindow::on_btnPlay_clicked()
     lblPlayer->setFocus();
 
     // Initialize timer:
-    timer->setInterval(100);
+    timer->setInterval(50);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerHit()));
     timer->start();
 }

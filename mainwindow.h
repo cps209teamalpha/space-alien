@@ -17,11 +17,17 @@ class MainWindow : public QMainWindow
 
     QTimer *timer = new QTimer(this);
 
+    bool upKeyPressed = false;
+    bool downKeyPressed = false;
+    bool rightKeyPressed = false;
+    bool leftKeyPressed = false;
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
     void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 private slots:
     void timerHit();
