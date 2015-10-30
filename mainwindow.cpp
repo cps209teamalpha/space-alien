@@ -96,6 +96,24 @@ void MainWindow::timerHit()
             int deltaX = lblEnemy->getDeltaX();
             int deltaY = lblEnemy->getDeltaY();
             lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
+            //Bounds Checking
+            if (lblEnemy->x() == 800)
+            {
+                lblEnemy->move(lblEnemy->x() - 800, lblEnemy->y() + 0);
+            }
+            else if (lblEnemy->x() == 0)
+            {
+                lblEnemy->move(lblEnemy->x() + 800, lblEnemy->y() + 0);
+            }
+
+            if (lblEnemy->y() == 573)
+            {
+                lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() - 573);
+            }
+            else if (lblEnemy->y() == 0)
+            {
+                lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() + 573);
+            }
         }
     }
 }
