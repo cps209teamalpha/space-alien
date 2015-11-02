@@ -196,6 +196,7 @@ void MainWindow::on_btnPlay_clicked()
         alien->setPixmap(evil);
         alien->setGeometry(QRect(label_left, label_top, 32, 32));
         alien->setScaledContents(true);
+        alien->setAttribute(Qt::WA_TranslucentBackground, true);
         alien->show();
     }
 
@@ -207,6 +208,8 @@ void MainWindow::on_btnPlay_clicked()
     lblPlayer->setPixmap(pixmap);
     lblPlayer->setOrigPixmap(pixmap);
     lblPlayer->setScaledContents(true);
+    lblPlayer->setAttribute(Qt::WA_TranslucentBackground, true);
+
     lblPlayer->show();
     lblPlayer->setFocus();
 
