@@ -40,7 +40,6 @@ void PlayerLabel::rotate(int angle)
     QPixmap pixmap;
     pixmap = orig_pixmap->transformed(rotate_label, Qt::SmoothTransformation);
 
-    // Working on rotation: 10:55-11:25 am
     double scale;
 
     if ((angle > 90) && (angle < 180)) // Between 90 and 180 degrees
