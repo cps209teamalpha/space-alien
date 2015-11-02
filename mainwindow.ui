@@ -73,7 +73,7 @@ selection-color: rgb(0, 255, 0);
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap>:/images/logo.png</pixmap>
+     <pixmap resource="resources.qrc">:/images/logo.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
