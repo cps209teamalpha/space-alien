@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QTransform>
+#include <QMatrix>
 
 #include "game.h"
 #include "player.h"
@@ -34,30 +35,32 @@ void PlayerLabel::rotate(int angle)
 {
     QTransform rotate_label;
 
-    rotate_label.rotate(angle, Qt::ZAxis);
+    rotate_label.rotate(angle);
 
     QPixmap pixmap;
     pixmap = orig_pixmap->transformed(rotate_label, Qt::SmoothTransformation);
 
-    // Code to scale the image appropriately as
-    // it rotates
-/*    int newWidth;
-    int newHeight;
-    int imageAngle = myPlayer->getRot();
+    double scale;
 
-    if (myPlayer->getRot() < 90)
+    if ((angle > 90) && (angle < 180)) // Between 90 and 180 degrees
     {
-        newWidth = (int)round((orig_pixmap->width() * sin(90 - imageAngle)) + (orig_pixmap->height() * sin(imageAngle)));
-        newHeight = (int)round((orig_pixmap->width() * sin(imageAngle)) + (orig_pixmap->height() * sin(90 - imageAngle)));
+        angle -= 90;
     }
-    else if (myPlayer->getAngle() > 270)
+    else if ((angle > 180) && (angle < 270)) // Between 180 and 270 degrees
     {
-        imageAngle = 360 - imageAngle;
-        newWidth = (int)round((orig_pixmap->width() * sin(90 - imageAngle)) + (orig_pixmap->height() * sin(imageAngle)));
-        newHeight = (int)round((orig_pixmap->width() * sin(imageAngle)) + (orig_pixmap->height() * sin(90 - imageAngle)));
+        angle -= 180;
     }
-    setGeometry(this->x(), this->y(), newWidth, newHeight);*/
+    else if ((angle > 270) && (angle < 360)) // Between 270 and 360 degrees
+    {
+        angle -= 270;
+    }
 
+    scale = ((41 * abs(sin(angle * M_PI / 180))) + (41 * abs(sin((90 - angle) * M_PI / 180)))) / 41;
+
+    int newX = round(this->x() - (((41 * scale) - 41) / 2));
+    int newY = round(this->y() - (((41 * scale) - 41) / 2));
+
+    setGeometry(newX, newY, 41 * scale, 41 * scale);
     setPixmap(pixmap);
 }
 
