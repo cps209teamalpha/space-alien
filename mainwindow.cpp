@@ -12,6 +12,7 @@
 #include "game.h"
 #include "player.h"
 #include "enemyspawn.h"
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -91,6 +92,27 @@ void MainWindow::timerHit()
             {
                 Game::instance()->getPlayer()->turnRight();
                 lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+            }
+
+            //Collision
+            //TODO(Italo:) When moving fast it detects collision a little too early. See if this is due to the glitchy movement.
+            //2D unit collision algorithm from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
+            for (int i = 0; i < objList.size(); i++)
+            {
+                //
+                Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+                if (test != nullptr)
+                {
+                   if (lblPlayer->x() < test->x() + test->width() &&
+                           lblPlayer->x() + lblPlayer->y() > test->x() &&
+                           lblPlayer->y() < test->y() + test->height() &&
+                           lblPlayer->height() + lblPlayer->y() > test->y())
+                   {
+                       QMessageBox::information(this, "Hello", "You died!");
+                       QApplication::quit();
+                   }
+
+                }
             }
         }
         Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
