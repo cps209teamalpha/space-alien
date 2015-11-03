@@ -1,8 +1,9 @@
-#include <math.h>
+﻿#include <math.h>
 
 #include "player.h"
 
 #include <QDebug>
+#include <QtMath>
 
 using namespace std;
 
@@ -87,4 +88,15 @@ void Player::decelerate()
     speed--;
     if (speed < 0)
         speed = 0;
+}
+
+Phaser::Phaser(QWidget *parent,int init_angle, int initx, int inity): QLabel(parent) {
+
+    x = initx;
+    y = inity;
+    r = 2;
+    angle = init_angle;
+    speed = 5;
+    dx = 10;
+    dy = 10;
 }
