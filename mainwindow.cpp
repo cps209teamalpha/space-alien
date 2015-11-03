@@ -94,26 +94,45 @@ void MainWindow::timerHit()
                 lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
             }
 
+            //Bounds Checking
+            if (lblPlayer->x() > 800)
+            {
+                lblPlayer->move(780, lblPlayer->y());
+            }
+            else if (lblPlayer->x() < 0)
+            {
+                lblPlayer->move(20, lblPlayer->y());
+            }
+
+            if (lblPlayer->y() > 573)
+            {
+                lblPlayer->move(lblPlayer->x(),553);
+            }
+            else if (lblPlayer->y() < 0)
+            {
+                lblPlayer->move(lblPlayer->x(), 20);
+            }
+
             //Collision
             //TODO(Italo:) When moving fast it detects collision a little too early. See if this is due to the glitchy movement.
             //2D unit collision algorithm from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
             for (int i = 0; i < objList.size(); i++)
             {
-                //
                 Enemy *test = dynamic_cast<Enemy *>(objList[i]);
                 if (test != nullptr)
                 {
-                   if (lblPlayer->x() < test->x() + test->width() &&
-                           lblPlayer->x() + lblPlayer->y() > test->x() &&
-                           lblPlayer->y() < test->y() + test->height() &&
-                           lblPlayer->height() + lblPlayer->y() > test->y())
+                   if (lblPlayer->x() < (test->x() + (test->width() / 2)) &&
+                           (lblPlayer->x() + lblPlayer->width()) > test->x() &&
+                           lblPlayer->y() < (test->y() + (test->height() / 2)) &&
+                           ((lblPlayer->height() / 2) + lblPlayer->y()) > test->y())
                    {
-                       QMessageBox::information(this, "Hello", "You died!");
+                       QMessageBox::information(this, "", "You have been DESTROYED!");
                        QApplication::quit();
                    }
 
                 }
-            }
+            } //I fixed it the collision glitch lol - Anthony
+
         }
         Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
         if (lblEnemy != nullptr)
@@ -121,6 +140,7 @@ void MainWindow::timerHit()
             int deltaX = lblEnemy->getDeltaX();
             int deltaY = lblEnemy->getDeltaY();
             lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
+
             //Bounds Checking
             if (lblEnemy->x() == 800)
             {
@@ -160,7 +180,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 break;
             case Qt::Key_Down:
                 downKeyPressed = true;
-                qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," << Game::instance()->getPlayer()->getY() << ") traveling at " << Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " << Game::instance()->getPlayer()->getAngle() << " rotated " << Game::instance()->getPlayer()->getRot() << " degrees." << endl;
+                qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," <<
+                            Game::instance()->getPlayer()->getY() << ") traveling at " <<
+                            Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " <<
+                            Game::instance()->getPlayer()->getAngle() << " rotated " <<
+                            Game::instance()->getPlayer()->getRot() << " degrees." << endl;
                 break;
             case Qt::Key_Left:
                 leftKeyPressed = true;
