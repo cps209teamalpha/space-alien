@@ -180,7 +180,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 break;
             case Qt::Key_Down:
                 downKeyPressed = true;
-                qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," << Game::instance()->getPlayer()->getY() << ") traveling at " << Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " << Game::instance()->getPlayer()->getAngle() << " rotated " << Game::instance()->getPlayer()->getRot() << " degrees." << endl;
+                qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," <<
+                            Game::instance()->getPlayer()->getY() << ") traveling at " <<
+                            Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " <<
+                            Game::instance()->getPlayer()->getAngle() << " rotated " <<
+                            Game::instance()->getPlayer()->getRot() << " degrees." << endl;
                 break;
             case Qt::Key_Left:
                 leftKeyPressed = true;
