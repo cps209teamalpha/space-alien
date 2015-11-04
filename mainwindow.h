@@ -21,6 +21,7 @@ class MainWindow : public QMainWindow
     bool downKeyPressed = false;
     bool rightKeyPressed = false;
     bool leftKeyPressed = false;
+    bool spacebarKeyPressed = false;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

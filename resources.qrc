@@ -11,5 +11,7 @@
         <file>images/logo.png</file>
         <file>images/space.jpg</file>
         <file>images/spaceship.png</file>
+        <file>images/energy.png</file>
+        <file>images/pew.png</file>
     </qresource>
 </RCC>

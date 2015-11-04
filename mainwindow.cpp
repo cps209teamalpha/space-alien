@@ -8,6 +8,7 @@
 #include <QPixmap>
 #include <QTransform>
 #include <QMatrix>
+#include <QtMath>
 
 #include "game.h"
 #include "player.h"
@@ -93,6 +94,16 @@ void MainWindow::timerHit()
                 Game::instance()->getPlayer()->turnRight();
                 lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
             }
+            if (spacebarKeyPressed)
+            {
+                Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getAngle()),double(lblPlayer->x()
+                                              + 42), double(lblPlayer->y() + 42));
+                QPixmap bullet(":/images/energy.png"); //change this to a laser shot after testing!
+                pew->setPixmap(bullet);
+                pew->setGeometry(QRect(pew->getX(), pew->getY(), 32, 32));
+                pew->setScaledContents(true);
+                pew->show();
+            }
 
             //Bounds Checking
             if (lblPlayer->x() > 800)
@@ -160,6 +171,12 @@ void MainWindow::timerHit()
                 lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() + 573);
             }
         }
+        //Can someone please help me with this? It will not keep updating the phaser's position!
+        Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
+        if (lblPew != nullptr)
+        {
+            lblPew->move(lblPew->getX() + 10, lblPew->getY() + 10);
+        }
     }
 }
 
@@ -192,6 +209,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             case Qt::Key_Right:
                 rightKeyPressed = true;
                 break;
+            case Qt::Key_Space:
+                spacebarKeyPressed = true;
+                break;
             default:
                 break;
             }
@@ -214,6 +234,9 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         break;
     case Qt::Key_Right:
         rightKeyPressed = false;
+        break;
+    case Qt::Key_Space:
+        spacebarKeyPressed = false;
         break;
     default:
         break;
