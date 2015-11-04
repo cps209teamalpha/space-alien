@@ -8,7 +8,6 @@
 #include <QPixmap>
 #include <QTransform>
 #include <QMatrix>
-#include <QtMath>
 
 #include "game.h"
 #include "player.h"
@@ -175,7 +174,13 @@ void MainWindow::timerHit()
         Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
         if (lblPew != nullptr)
         {
-            lblPew->move(lblPew->getX() + 10, lblPew->getY() + 10);
+            int x = 0;
+            int y = 0;
+            x = lblPew->getX() + 10;
+            y = lblPew->getY() + 10;
+            lblPew->setX(x);
+            lblPew->setY(y);
+            lblPew->move(x, y);
         }
     }
 }

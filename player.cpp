@@ -3,7 +3,6 @@
 #include "player.h"
 
 #include <QDebug>
-#include <QtMath>
 
 using namespace std;
 
