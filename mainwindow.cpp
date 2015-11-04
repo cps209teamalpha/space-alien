@@ -170,7 +170,10 @@ void MainWindow::timerHit()
                 lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() + 573);
             }
         }
-        //Can someone please help me with this? It will not keep updating the phaser's position!
+        //Note from Italo: You did not update the member projectile's X and Y member variables
+        //after incrementing them. So the loop would just increment the same value infinitely.
+        //Also, added condition to delete the projectiles when they move off screen.
+        //Need to work on putting the projectiles in front of the ship next.
         Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
         if (lblPew != nullptr)
         {
@@ -181,6 +184,17 @@ void MainWindow::timerHit()
             lblPew->setX(x);
             lblPew->setY(y);
             lblPew->move(x, y);
+            if (lblPew->getX() >= 800)
+            {
+                lblPew->deleteLater();
+                qDebug() << "deleted" << endl;
+            }
+
+            else if (lblPew->getY() >= 573)
+            {
+                lblPew->deleteLater();
+                qDebug() << "deleted" << endl;
+            }
         }
     }
 }
