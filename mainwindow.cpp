@@ -136,6 +136,7 @@ void MainWindow::timerHit()
                            lblPlayer->y() < (test->y() + (test->height() / 2)) &&
                            ((lblPlayer->height() / 2) + lblPlayer->y()) > test->y())
                    {
+                       // (Matt) Might bring up a galaga-style highscore window
                        QMessageBox::information(this, "", "You have been DESTROYED!");
                        QApplication::quit();
                    }
