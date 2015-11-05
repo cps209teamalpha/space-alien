@@ -55,23 +55,21 @@ private:
 
 
 public:
-    int x, y, dx, dy, rad, speed, angle;
-    int r;
+    double x, y, dx, dy, rad, speed, angle;
     bool firing;
 
-    explicit Phaser(QWidget *parent,int init_angle, int initx, int inity);
+    explicit Phaser(QWidget *parent,double init_angle, double initx, double inity);
 
-    int getX() { return x; }
-    int getY() { return y; }
-    int getDX() { return dx; }
-    int getDY() { return dy; }
-    int getRad() { return rad; }
-    int getSpeed() { return speed; }
-    int getR() { return r; }
+    double getX() { return x; }
+    double getY() { return y; }
+    double getDX() { return dx; }
+    double getDY() { return dy; }
+    double getRad() { return rad; }
+    double getSpeed() { return speed; }
 
-    void setX(int initx) { x = initx; }
-    void setY(int inity) { y = inity; }
-    void setAngle(int init_angle) { angle = init_angle; }
+    void setX(double initx) { x = initx; }
+    void setY(double inity) { y = inity; }
+    void setAngle(double init_angle) { angle = init_angle; }
 
 };
 
