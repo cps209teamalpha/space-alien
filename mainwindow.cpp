@@ -97,9 +97,9 @@ void MainWindow::timerHit()
             {
                 Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getRot()),double(lblPlayer->x()
                                               + 42), double(lblPlayer->y() + 42));
-                QPixmap bullet(":/images/energy.png");
+                QPixmap bullet(":/images/pew.png");
                 pew->setPixmap(bullet);
-                pew->setGeometry(QRect(pew->getX(), pew->getY(), 32, 32));
+                pew->setGeometry(QRect(pew->getX(), pew->getY(), 16, 16));
                 pew->setScaledContents(true);
                 pew->setAttribute(Qt::WA_TranslucentBackground, true);
                 pew->show();
