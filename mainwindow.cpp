@@ -95,12 +95,13 @@ void MainWindow::timerHit()
             }
             if (spacebarKeyPressed)
             {
-                Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getAngle()),double(lblPlayer->x()
+                Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getRot()),double(lblPlayer->x()
                                               + 42), double(lblPlayer->y() + 42));
-                QPixmap bullet(":/images/energy.png"); //change this to a laser shot after testing!
+                QPixmap bullet(":/images/energy.png");
                 pew->setPixmap(bullet);
                 pew->setGeometry(QRect(pew->getX(), pew->getY(), 32, 32));
                 pew->setScaledContents(true);
+                pew->setAttribute(Qt::WA_TranslucentBackground, true);
                 pew->show();
             }
 
@@ -139,7 +140,6 @@ void MainWindow::timerHit()
                        QMessageBox::information(this, "", "You have been DESTROYED!");
                        QApplication::quit();
                    }
-
                 }
             } //I fixed it the collision glitch lol - Anthony
 
@@ -177,23 +177,23 @@ void MainWindow::timerHit()
         Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
         if (lblPew != nullptr)
         {
-            int x = 0;
-            int y = 0;
-            x = lblPew->getX() + 10;
-            y = lblPew->getY() + 10;
+            double x = 0;
+            double y = 0;
+            x = lblPew->getX() + lblPew->getDX();
+            y = lblPew->getY() + lblPew->getDY();
             lblPew->setX(x);
             lblPew->setY(y);
-            lblPew->move(x, y);
+            lblPew->move(int(x), int(y));
             if (lblPew->getX() >= 800)
             {
                 lblPew->deleteLater();
-                qDebug() << "deleted" << endl;
+                qDebug() << "Phaser is deleted" << endl;
             }
 
             else if (lblPew->getY() >= 573)
             {
                 lblPew->deleteLater();
-                qDebug() << "deleted" << endl;
+                qDebug() << "Phaser is deleted" << endl;
             }
         }
     }
