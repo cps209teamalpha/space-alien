@@ -133,4 +133,25 @@ Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): 
 
 }
 
+void Phaser::updatePhaser(Phaser *lblPew)
+{
+    double x = 0;
+    double y = 0;
+    x = lblPew->getX() + lblPew->getDX();
+    y = lblPew->getY() + lblPew->getDY();
+    lblPew->setX(x);
+    lblPew->setY(y);
+    lblPew->move(int(x), int(y));
+    if (lblPew->getX() >= 800)
+    {
+        lblPew->deleteLater();
+        qDebug() << "Phaser is deleted" << endl;
+    }
+
+    else if (lblPew->getY() >= 573)
+    {
+        lblPew->deleteLater();
+        qDebug() << "Phaser is deleted" << endl;
+    }
+}
 

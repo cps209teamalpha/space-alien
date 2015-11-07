@@ -61,6 +61,7 @@ public:
         offsetX = 0;
         offsetY = 0;
     }
+    void playerGen(QPixmap pixmap, PlayerLabel *lblPlayer);
 
     int getOffsetX() { return offsetX; }
     int getOffsetY() { return offsetY; }
