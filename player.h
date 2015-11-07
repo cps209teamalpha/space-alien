@@ -8,7 +8,7 @@
 // we may as well make it an object from
 // the start.
 
-class Player
+class Player : public QLabel
 {
 private:
     int rotation; // The direction the ship is pointing (360 degrees)
@@ -59,6 +59,7 @@ public:
     bool firing;
 
     explicit Phaser(QWidget *parent,double init_angle, double initx, double inity);
+    void updatePhaser(Phaser *lblPew);
 
     double getX() { return x; }
     double getY() { return y; }

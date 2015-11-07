@@ -46,6 +46,8 @@ class PlayerLabel : public QLabel
 {
     Q_OBJECT
 
+    int offsetX, offsetY; // The offset (based on image rotation and scaling) between the image's coordinates and the player's coordinates
+
     Player *myPlayer;
 
     QPixmap *orig_pixmap;
@@ -56,8 +58,13 @@ public:
         {
             orig_pixmap = new QPixmap(*this->pixmap());
         }
+        offsetX = 0;
+        offsetY = 0;
     }
+    void playerGen(QPixmap pixmap, PlayerLabel *lblPlayer);
 
+    int getOffsetX() { return offsetX; }
+    int getOffsetY() { return offsetY; }
     Player *getPlayer() { return myPlayer; }
     void setPlayer(Player *player) { myPlayer = player; }
     void setOrigPixmap(QPixmap &pixmap) { orig_pixmap = new QPixmap(pixmap); }

@@ -23,6 +23,24 @@ void Player::move()
     // qDebug() << "Angle: " << angle << "(sin " << sin(angle * M_PI / 180) << ") yInc: " << yInc << "xInc: " << xInc << endl;
     x += xInc;
     y += yInc;
+
+    if (x >= 800)
+    {
+        x -= 800;
+    }
+    else if (x <= 0)
+    {
+        x += 800;
+    }
+
+    if (y >= 573)
+    {
+        y -= 573;
+    }
+    else if (y <= 0)
+    {
+        y += 573;
+    }
 }
 
 // Rotates the ship to the left
@@ -115,4 +133,25 @@ Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): 
 
 }
 
+void Phaser::updatePhaser(Phaser *lblPew)
+{
+    double x = 0;
+    double y = 0;
+    x = lblPew->getX() + lblPew->getDX();
+    y = lblPew->getY() + lblPew->getDY();
+    lblPew->setX(x);
+    lblPew->setY(y);
+    lblPew->move(int(x), int(y));
+    if (lblPew->getX() >= 800)
+    {
+        lblPew->deleteLater();
+        qDebug() << "Phaser is deleted" << endl;
+    }
+
+    else if (lblPew->getY() >= 573)
+    {
+        lblPew->deleteLater();
+        qDebug() << "Phaser is deleted" << endl;
+    }
+}
 
