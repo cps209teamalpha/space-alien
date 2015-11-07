@@ -3,6 +3,7 @@
 #include "player.h"
 
 #include <QDebug>
+#include <QtMath>
 
 using namespace std;
 
@@ -89,13 +90,29 @@ void Player::decelerate()
         speed = 0;
 }
 
-Phaser::Phaser(QWidget *parent,int init_angle, int initx, int inity): QLabel(parent) {
+Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): QLabel(parent) {
 
     x = initx;
     y = inity;
-    r = 2;
+
     angle = init_angle;
-    speed = 5;
-    dx = 10;
-    dy = 10;
+    rad = qDegreesToRadians(angle);
+    speed = 15;
+
+    double yInc;
+    if (angle >= 90 && angle <= 270)
+    {
+        yInc = sqrt(speed + (speed * sin(angle * M_PI / 180)));
+    }
+    else
+    {
+        yInc = -1 * sqrt(speed - (speed * sin(angle * M_PI / 180)));
+    }
+    double xInc = speed * sin(angle * M_PI / 180);
+
+    dx = xInc * 6;
+    dy = yInc * 6;
+
 }
+
+
