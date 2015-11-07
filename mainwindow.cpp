@@ -166,6 +166,7 @@ void MainWindow::timerHit()
                           ((lblPew->height() / 2) + lblPew->y) > test->y())
                   {
                       test->deleteLater();
+                      lblPew->deleteLater();
                   }
                }
            }
