@@ -26,12 +26,27 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//Random integer generator
 int random_int(int min, int max) {
     static std::default_random_engine engine { std::random_device{}() };
     std::uniform_int_distribution<int> distro{min, max};
     return distro(engine);
 }
 
+//Generates player onto the window
+void PlayerLabel::playerGen(QPixmap pixmap, PlayerLabel *lblPlayer)
+{
+    lblPlayer->setGeometry(380, 190, 41, 41);
+    lblPlayer->setPixmap(pixmap);
+    lblPlayer->setOrigPixmap(pixmap);
+    lblPlayer->setScaledContents(true);
+    lblPlayer->setAttribute(Qt::WA_TranslucentBackground, true);
+
+    lblPlayer->show();
+    lblPlayer->setFocus();
+}
+
+//Rotates the player
 void PlayerLabel::rotate(int angle)
 {
     QTransform rotate_label;
@@ -68,6 +83,7 @@ void PlayerLabel::rotate(int angle)
     setPixmap(pixmap);
 }
 
+//Performs different operations on each timer event
 void MainWindow::timerHit()
 {
     Game::instance()->updateField();
@@ -109,7 +125,6 @@ void MainWindow::timerHit()
             }
 
             //Collision
-            //TODO(Italo:) When moving fast it detects collision a little too early. See if this is due to the glitchy movement.
             //2D unit collision algorithm from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
             for (int i = 0; i < objList.size(); i++)
             {
@@ -125,68 +140,28 @@ void MainWindow::timerHit()
                        QApplication::quit();
                    }
                 }
-            } //I fixed it the collision glitch lol - Anthony
+            }
 
         }
+        //Updates an Enemy's position
         Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
         if (lblEnemy != nullptr)
         {
-            int deltaX = lblEnemy->getDeltaX();
-            int deltaY = lblEnemy->getDeltaY();
-            lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
-
-            //Bounds Checking
-            if (lblEnemy->x() == 800)
-            {
-                lblEnemy->move(lblEnemy->x() - 800, lblEnemy->y() + 0);
-            }
-            else if (lblEnemy->x() == 0)
-            {
-                lblEnemy->move(lblEnemy->x() + 800, lblEnemy->y() + 0);
-            }
-
-            if (lblEnemy->y() == 573)
-            {
-                lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() - 573);
-            }
-            else if (lblEnemy->y() == 0)
-            {
-                lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() + 573);
-            }
+            lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
         }
-        //Note from Italo: You did not update the member projectile's X and Y member variables
-        //after incrementing them. So the loop would just increment the same value infinitely.
-        //Also, added condition to delete the projectiles when they move off screen.
-        //Need to work on putting the projectiles in front of the ship next.
+
+        //Updates the Phaser's position that was just recently fired
         Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
         if (lblPew != nullptr)
         {
-            double x = 0;
-            double y = 0;
-            x = lblPew->getX() + lblPew->getDX();
-            y = lblPew->getY() + lblPew->getDY();
-            lblPew->setX(x);
-            lblPew->setY(y);
-            lblPew->move(int(x), int(y));
-            if (lblPew->getX() >= 800)
-            {
-                lblPew->deleteLater();
-                qDebug() << "Phaser is deleted" << endl;
-            }
-
-            else if (lblPew->getY() >= 573)
-            {
-                lblPew->deleteLater();
-                qDebug() << "Phaser is deleted" << endl;
-            }
+           lblPew->updatePhaser(lblPew); //Same here
         }
     }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    // Get rid of these unnecessary functions
-    // once we remove the qDebug() message.
+    //Sets a key variable true if pressed
     QObjectList objList = ui->centralWidget->children();
     for (QObject *lbl : objList)
     {
@@ -200,11 +175,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 break;
             case Qt::Key_Down:
                 downKeyPressed = true;
-                qDebug() << "Ship at (" << Game::instance()->getPlayer()->getX() << "," <<
-                            Game::instance()->getPlayer()->getY() << ") traveling at " <<
-                            Game::instance()->getPlayer()->getSpeed() << " upt at an angle of " <<
-                            Game::instance()->getPlayer()->getAngle() << " rotated " <<
-                            Game::instance()->getPlayer()->getRot() << " degrees." << endl;
                 break;
             case Qt::Key_Left:
                 leftKeyPressed = true;
@@ -222,6 +192,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     }
 }
 
+//Sets a key variable false if released
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
     switch (event->key())
@@ -245,7 +216,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         break;
     }
 }
-// Matt: Brethen, doest thou participate in the act of the separation of large mass from the earth against its gravitational influence, for the ideal purpose of increasing muscle volume and the burning of the chubs?
 
 void MainWindow::on_btnPlay_clicked()
 {
@@ -268,25 +238,14 @@ void MainWindow::on_btnPlay_clicked()
 
         Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
         QPixmap evil(":/images/asteroid.png");
-        alien->setPixmap(evil);
-        alien->setGeometry(QRect(label_left, label_top, 32, 32));
-        alien->setScaledContents(true);
-        alien->setAttribute(Qt::WA_TranslucentBackground, true);
-        alien->show();
+        alien->enemyGen(evil, alien, label_left, label_top);
     }
 
     // Player set-up
     PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
     lblPlayer->setPlayer(Game::instance()->getPlayer());
     QPixmap pixmap(":/images/spaceship.png");
-    lblPlayer->setGeometry(380, 190, 41, 41);
-    lblPlayer->setPixmap(pixmap);
-    lblPlayer->setOrigPixmap(pixmap);
-    lblPlayer->setScaledContents(true);
-    lblPlayer->setAttribute(Qt::WA_TranslucentBackground, true);
-
-    lblPlayer->show();
-    lblPlayer->setFocus();
+    lblPlayer->playerGen(pixmap, lblPlayer); //Anyone can fix this if they like lol
 
     // Initialize timer:
     timer->setInterval(50);
