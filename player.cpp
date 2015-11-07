@@ -23,6 +23,24 @@ void Player::move()
     // qDebug() << "Angle: " << angle << "(sin " << sin(angle * M_PI / 180) << ") yInc: " << yInc << "xInc: " << xInc << endl;
     x += xInc;
     y += yInc;
+
+    if (x >= 800)
+    {
+        x -= 800;
+    }
+    else if (x <= 0)
+    {
+        x += 800;
+    }
+
+    if (y >= 573)
+    {
+        y -= 573;
+    }
+    else if (y <= 0)
+    {
+        y += 573;
+    }
 }
 
 // Rotates the ship to the left

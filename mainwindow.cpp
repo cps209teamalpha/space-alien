@@ -58,10 +58,13 @@ void PlayerLabel::rotate(int angle)
 
     scale = ((41 * abs(sin(angle * M_PI / 180))) + (41 * abs(sin((90 - angle) * M_PI / 180)))) / 41;
 
-    int newX = round(this->x() - (((41 * scale) - 41) / 2));
-    int newY = round(this->y() - (((41 * scale) - 41) / 2));
+    int newX = round(myPlayer->getX() - (((41 * scale) - 41) / 2));
+    int newY = round(myPlayer->getY() - (((41 * scale) - 41) / 2));
 
-    setGeometry(newX, newY, 41 * scale, 41 * scale);
+    offsetX = myPlayer->getX() - newX;
+    offsetY = myPlayer->getY() - newY;
+
+    setGeometry((myPlayer->getX() - offsetX), (getPlayer()->getY() - offsetY), 41 * scale, 41 * scale);
     setPixmap(pixmap);
 }
 
@@ -74,7 +77,7 @@ void MainWindow::timerHit()
         PlayerLabel *lblPlayer = dynamic_cast<PlayerLabel *>(lbl);
         if (lblPlayer != nullptr)
         {
-            lblPlayer->move(lblPlayer->getPlayer()->getX(), lblPlayer->getPlayer()->getY());
+            lblPlayer->move((lblPlayer->getPlayer()->getX() - lblPlayer->getOffsetX()), (lblPlayer->getPlayer()->getY() - lblPlayer->getOffsetY()));
             if (upKeyPressed)
             {
                 lblPlayer->getPlayer()->accelerate();
@@ -103,25 +106,6 @@ void MainWindow::timerHit()
                 pew->setScaledContents(true);
                 pew->setAttribute(Qt::WA_TranslucentBackground, true);
                 pew->show();
-            }
-
-            //Bounds Checking
-            if (lblPlayer->x() > 800)
-            {
-                lblPlayer->move(780, lblPlayer->y());
-            }
-            else if (lblPlayer->x() < 0)
-            {
-                lblPlayer->move(20, lblPlayer->y());
-            }
-
-            if (lblPlayer->y() > 573)
-            {
-                lblPlayer->move(lblPlayer->x(),553);
-            }
-            else if (lblPlayer->y() < 0)
-            {
-                lblPlayer->move(lblPlayer->x(), 20);
             }
 
             //Collision
