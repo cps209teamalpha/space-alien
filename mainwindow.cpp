@@ -118,7 +118,7 @@ void MainWindow::timerHit()
                                               + 42), double(lblPlayer->y() + 42));
                 QPixmap bullet(":/images/pew.png");
                 pew->setPixmap(bullet);
-                pew->setGeometry(QRect(pew->getX(), pew->getY(), 16, 16));
+                pew->setGeometry(QRect(pew->getX(), pew->getY(), 20, 20));
                 pew->setScaledContents(true);
                 pew->setAttribute(Qt::WA_TranslucentBackground, true);
                 pew->show();
@@ -155,6 +155,21 @@ void MainWindow::timerHit()
         if (lblPew != nullptr)
         {
            lblPew->updatePhaser(lblPew); //Same here
+           for (int i = 0; i < objList.size(); i++)
+           {
+               Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+               if (test != nullptr)
+               {
+                  if (lblPew->x < (test->x() + (test->width() / 2)) &&
+                          (lblPew->x + lblPew->width()) > test->x() &&
+                          lblPew->y < (test->y() + (test->height() / 2)) &&
+                          ((lblPew->height() / 2) + lblPew->y) > test->y())
+                  {
+                      test->deleteLater();
+                  }
+               }
+           }
+
         }
     }
 }
