@@ -16,15 +16,12 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     game.cpp \
     player.cpp \
-    enemyspawn.cpp \
-    highscore.cpp
+    enemyspawn.cpp
 
 HEADERS  += mainwindow.h \
     game.h \
     player.h \
-    enemyspawn.h \
-    highscore.h \
-    score.h
+    enemyspawn.h
 
 FORMS    += mainwindow.ui
 
