@@ -15,6 +15,10 @@
 #include <QMessageBox>
 #include <QSound>
 
+#ifndef M_PI
+#define M_PI (atan(1) * 4)
+#endif
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -159,21 +163,16 @@ void MainWindow::timerHit()
             }
             if (spacebarKeyPressed)
             {
-                Game::instance()->addShot(double(lblPlayer->x() + 42), double(lblPlayer->y() + 42));
+                Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
 
                 ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
                 lblShot->setShot(Game::instance()->getLastShot());
                 lblShot->shotGen();
-                /*Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getRot()),double(lblPlayer->x()
-                                              + 42), double(lblPlayer->y() + 42));
-                pewSound->play();
-                QPixmap bullet(":/images/pew.png");
-                pew->setPixmap(bullet);
-                pew->setGeometry(QRect(pew->getX(), pew->getY(), 20, 20));
-                pew->setScaledContents(true);
-                pew->setAttribute(Qt::WA_TranslucentBackground, true);
-                pew->show();*/
+                if (ui->cbSound->isChecked())
+                {
+                    pewSound->play();
+                }
             }
 
             //Collision
@@ -188,13 +187,32 @@ void MainWindow::timerHit()
                            lblPlayer->y() < (test->y() + (test->height() / 2)) &&
                            ((lblPlayer->height() / 2) + lblPlayer->y()) > test->y())
                    {
-                       riperinoPlayerino->play();
+                       if (ui->cbSound->isChecked())
+                       {
+                           riperinoPlayerino->play();
+                       }
                        QMessageBox::information(this, "", "You have been DESTROYED!");
                        QApplication::quit();
                    }
                 }
             }
 
+        }
+        if (Game::instance()->getUntrackedShots() > 0)
+        {
+            vector<Shot*> shots = Game::instance()->getShots();
+            for (size_t i = ((shots.size() - Game::instance()->getUntrackedShots()) - 1); i < shots.size(); i++)
+            {
+                ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
+
+                lblShot->setShot(shots[i]);
+                lblShot->shotGen();
+                if (ui->cbSound->isChecked())
+                {
+                    pewSound->play();
+                }
+            }
+            Game::instance()->setUntrackedShots(0);
         }
         AlienLabel *lblAlien = dynamic_cast<AlienLabel *>(lbl);
         if (lblAlien != nullptr)
@@ -205,6 +223,40 @@ void MainWindow::timerHit()
         if (lblShot != nullptr)
         {
             lblShot->move(lblShot->getShot()->getX(), lblShot->getShot()->getY());
+            if ((lblShot->getShot()->getX() >= 800) ||
+                (lblShot->getShot()->getX() <= 0) ||
+                (lblShot->getShot()->getY() >= 573) ||
+                (lblShot->getShot()->getY() <= 0))
+            {
+                // For some reason deleting the label causes the program to crash.
+                // Deleting the shot will cause the label to remain on-screen.
+                // Keeping it around means it's still flying off-screen: could
+                // cause some performance issues (or unexpected bugs)
+                //Game::instance()->deleteShot(lblShot->getShot()->getID());
+                //lblShot->deleteLater();
+            }
+            for (int i = 0; i < objList.size(); i++)
+            {
+                Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+                if (test != nullptr)
+                {
+                   if (lblShot->x() < (test->x() + (test->width() / 2)) &&
+                           (lblShot->x() + lblShot->width()) > test->x() &&
+                           lblShot->y() < (test->y() + (test->height() / 2)) &&
+                           ((lblShot->height() / 2) + lblShot->y()) > test->y())
+
+                   {
+                       if (ui->cbSound->isChecked())
+                       {
+                           ripAsteroid->play();
+                       }
+                       test->deleteLater();
+                       // Causes errors - see above
+                       //Game::instance()->deleteShot(lblShot->getShot()->getID());
+                       //lblShot->deleteLater();
+                   }
+                }
+            }
         }
         //Updates an Enemy's position
         Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
@@ -212,31 +264,6 @@ void MainWindow::timerHit()
         {
             lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
         }
-
-        /*//Updates the Phaser's position that was just recently fired
-        Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
-        if (lblPew != nullptr)
-        {
-           lblPew->updatePhaser(lblPew); //Same here
-           for (int i = 0; i < objList.size(); i++)
-           {
-               Enemy *test = dynamic_cast<Enemy *>(objList[i]);
-               if (test != nullptr)
-               {
-                  if (lblPew->x < (test->x() + (test->width() / 2)) &&
-                          (lblPew->x + lblPew->width()) > test->x() &&
-                          lblPew->y < (test->y() + (test->height() / 2)) &&
-                          ((lblPew->height() / 2) + lblPew->y) > test->y())
-
-                  {
-                      ripAsteroid->play();
-                      test->deleteLater();
-                      lblPew->deleteLater();
-                  }
-               }
-           }
-
-        }*/
     }
 }
 
@@ -307,6 +334,7 @@ void MainWindow::on_btnPlay_clicked()
     ui->lblMove->deleteLater();
     ui->lblTitle->hide();
     ui->btnPlay->hide();
+    ui->cbSound->hide();
 
     // Enemy set-up
     int num_enemy = 5; //This amount for level 1 and PoC purposes

@@ -31,7 +31,7 @@ private:
 
     int angle;
 public:
-    Shot(int startX, int startY, int ID): x(startX), y(startY), id(ID) { }
+    Shot(int startX, int startY, int startAngle, int ID): x(startX), y(startY), angle(startAngle), id(ID) { }
 
     int getX() { return x; }
     int getY() { return y; }
@@ -55,6 +55,10 @@ private:
 
     int nextShot;
 
+    int shotTimer;
+
+    int untrackedShots;
+
     Game();
 public:
     // Wipes the current game and reinstantiates
@@ -65,15 +69,25 @@ public:
 
     void addAlien(int rotation);
 
-    void addShot(int origX, int origY)
+    void addUntrackedShot() { untrackedShots++; }
+
+    void setUntrackedShots(int amount) { untrackedShots = amount; }
+
+    int getUntrackedShots() { return untrackedShots; }
+
+    int getShotTimer() { return shotTimer; }
+
+    void addShot(int origX, int origY, int angle)
     {
-        shots.push_back(new Shot(origX, origY, nextShot));
+        shots.push_back(new Shot(origX, origY, angle, nextShot));
         nextShot++;
     }
 
     void deleteShot(int shotID);
 
     Shot *getLastShot() { return shots[shots.size() - 1]; }
+
+    vector<Shot*> getShots() { return shots; }
 
     // For debug purposes only:
     Player *getPlayer() { return players[0]; }

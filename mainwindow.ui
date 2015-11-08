@@ -79,6 +79,28 @@ selection-color: rgb(0, 255, 0);
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QCheckBox" name="cbSound">
+    <property name="geometry">
+     <rect>
+      <x>376</x>
+      <y>340</y>
+      <width>70</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Sounds</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -86,7 +108,7 @@ selection-color: rgb(0, 255, 0);
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

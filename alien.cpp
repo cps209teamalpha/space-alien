@@ -1,4 +1,5 @@
 #include "alien.h"
+#include "game.h"
 
 void Alien::move()
 {
@@ -38,5 +39,16 @@ void Alien::move()
 
 void Alien::shoot()
 {
-    // Shoot a shot towards the player
+    if (timedShot == Game::instance()->getShotTimer())
+    {
+        int shotAngle = rotation + 180;
+        if (shotAngle >= 360) shotAngle -= 360;
+        Game::instance()->addShot(x, y, shotAngle);
+        timedShot = 0;
+        Game::instance()->addUntrackedShot();
+    }
+    else
+    {
+        timedShot++;
+    }
 }

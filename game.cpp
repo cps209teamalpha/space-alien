@@ -16,6 +16,8 @@ Game::Game()
     highscores = new Highscores();
     players.push_back(new Player(380, 190));
     nextShot = 0;
+    shotTimer = 50;
+    untrackedShots = 0;
 }
 
 void Game::addAlien(int rotation)
@@ -61,6 +63,7 @@ void Game::updateField()
     for (size_t i = 0; i < aliens.size(); i++)
     {
         aliens[i]->move();
+        aliens[i]->shoot();
     }
     for (size_t i = 0; i < shots.size(); i++)
     {
@@ -142,14 +145,6 @@ void Shot::move()
     double xInc = 30 * sin(angle * M_PI / 180);
     x += xInc;
     y += yInc;
-
-    if ((x >= 800) ||
-        (x <= 0) ||
-        (y >= 573) ||
-        (y <= 0))
-    {
-        Game::instance()->deleteShot(id);
-    }
 }
 
 // Default constructor for Highscore object
