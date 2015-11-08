@@ -240,6 +240,20 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+// Generate X number of enemies on the screen
+void MainWindow::makeEnemies(int num_enemy) {
+    for (size_t i = 0; i < num_enemy; ++i)
+    {
+        auto label_left = random_int(0, this->geometry().width() - 32);
+        auto label_top = random_int(ui->btnPlay->geometry().bottom(),
+                       this->geometry().height() - 32);
+
+        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
+        QPixmap evil(":/images/asteroid.png");
+        alien->enemyGen(evil, alien, label_left, label_top);
+    }
+}
+
 void MainWindow::on_btnPlay_clicked()
 {
     // Initialize game
@@ -252,17 +266,7 @@ void MainWindow::on_btnPlay_clicked()
 
     // Enemy set-up
     int num_enemy = 5; //This amount for level 1 and PoC purposes
-
-    for (int i = 0; i < num_enemy; ++i)
-    {
-        auto label_left = random_int(0, this->geometry().width() - 32);
-        auto label_top = random_int(ui->btnPlay->geometry().bottom(),
-                       this->geometry().height() - 32);
-
-        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
-        QPixmap evil(":/images/asteroid.png");
-        alien->enemyGen(evil, alien, label_left, label_top);
-    }
+    makeEnemies(num_enemy);
 
     // Player set-up
     PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
