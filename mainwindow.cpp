@@ -85,6 +85,33 @@ void PlayerLabel::rotate(int angle)
     setPixmap(pixmap);
 }
 
+// Generate X number of enemies on the screen
+void MainWindow::makeEnemies(int num_enemy) {
+    for (size_t i = 0; i < num_enemy; ++i)
+    {
+        auto label_left = random_int(0, this->geometry().width() - 32);
+        auto label_top = random_int(ui->btnPlay->geometry().bottom(),
+                       this->geometry().height() - 32);
+
+        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
+        QPixmap evil(":/images/asteroid.png");
+        alien->enemyGen(evil, alien, label_left, label_top);
+        ++currentEnemies;
+    }
+}
+
+// If no enemies are left, return true
+bool MainWindow::noEnemiesLeft() {
+    if (currentEnemies == 0) return true;
+    else                     return false;
+}
+
+// lazy level implementation
+void MainWindow::advanceLevel() {
+    currentLevel += 1;
+    makeEnemies(num_enemy * currentLevel);
+}
+
 //Performs different operations on each timer event
 void MainWindow::timerHit()
 {
@@ -173,11 +200,15 @@ void MainWindow::timerHit()
                   {
                       ripAsteroid->play();
                       test->deleteLater();
+                      --currentEnemies;
                       lblPew->deleteLater();
+
+                      if(noEnemiesLeft()) {
+                          advanceLevel();
+                      }
                   }
                }
            }
-
         }
     }
 }
@@ -240,20 +271,6 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-// Generate X number of enemies on the screen
-void MainWindow::makeEnemies(int num_enemy) {
-    for (size_t i = 0; i < num_enemy; ++i)
-    {
-        auto label_left = random_int(0, this->geometry().width() - 32);
-        auto label_top = random_int(ui->btnPlay->geometry().bottom(),
-                       this->geometry().height() - 32);
-
-        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
-        QPixmap evil(":/images/asteroid.png");
-        alien->enemyGen(evil, alien, label_left, label_top);
-    }
-}
-
 void MainWindow::on_btnPlay_clicked()
 {
     // Initialize game
@@ -265,7 +282,7 @@ void MainWindow::on_btnPlay_clicked()
     ui->btnPlay->hide();
 
     // Enemy set-up
-    int num_enemy = 5; //This amount for level 1 and PoC purposes
+    num_enemy = 5; //This amount for level 1 and PoC purposes
     makeEnemies(num_enemy);
 
     // Player set-up

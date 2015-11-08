@@ -86,7 +86,7 @@ selection-color: rgb(0, 255, 0);
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
