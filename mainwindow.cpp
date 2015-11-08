@@ -13,6 +13,8 @@
 #include "player.h"
 #include "enemyspawn.h"
 #include <QMessageBox>
+#include <QSound>
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -116,6 +118,7 @@ void MainWindow::timerHit()
             {
                 Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getRot()),double(lblPlayer->x()
                                               + 42), double(lblPlayer->y() + 42));
+                pewSound->play();
                 QPixmap bullet(":/images/pew.png");
                 pew->setPixmap(bullet);
                 pew->setGeometry(QRect(pew->getX(), pew->getY(), 20, 20));
@@ -136,6 +139,7 @@ void MainWindow::timerHit()
                            lblPlayer->y() < (test->y() + (test->height() / 2)) &&
                            ((lblPlayer->height() / 2) + lblPlayer->y()) > test->y())
                    {
+                       riperinoPlayerino->play();
                        QMessageBox::information(this, "", "You have been DESTROYED!");
                        QApplication::quit();
                    }
@@ -164,7 +168,9 @@ void MainWindow::timerHit()
                           (lblPew->x + lblPew->width()) > test->x() &&
                           lblPew->y < (test->y() + (test->height() / 2)) &&
                           ((lblPew->height() / 2) + lblPew->y) > test->y())
+
                   {
+                      ripAsteroid->play();
                       test->deleteLater();
                       lblPew->deleteLater();
                   }

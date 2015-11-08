@@ -32,3 +32,4 @@ QMAKE_CXXFLAGS += -std=c++11
 
 RESOURCES += \
     resources.qrc
+QT += multimedia
