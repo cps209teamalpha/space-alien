@@ -22,6 +22,8 @@ public:
        dX = initX;
        dY = initY;
     }
+    void enemyGen(QPixmap evil, Enemy *alien, int label_left, int label_top);
+    void updateEnemy(Enemy *lblEnemy);
 
 
  int getDeltaX() { return dX; }

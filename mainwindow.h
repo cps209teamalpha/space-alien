@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QTimer>
+#include <QSound>
 
 #include "player.h"
 
@@ -16,6 +17,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     QTimer *timer = new QTimer(this);
+    //creating these now so they don't lag up the game to death
+    QSound *pewSound = new QSound(":/images/pew.wav");
+    QSound *riperinoPlayerino = new QSound(":/images/ripplayer.wav");
+     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
 
     bool upKeyPressed = false;
     bool downKeyPressed = false;
@@ -46,6 +51,8 @@ class PlayerLabel : public QLabel
 {
     Q_OBJECT
 
+    int offsetX, offsetY; // The offset (based on image rotation and scaling) between the image's coordinates and the player's coordinates
+
     Player *myPlayer;
 
     QPixmap *orig_pixmap;
@@ -56,8 +63,13 @@ public:
         {
             orig_pixmap = new QPixmap(*this->pixmap());
         }
+        offsetX = 0;
+        offsetY = 0;
     }
+    void playerGen(QPixmap pixmap, PlayerLabel *lblPlayer);
 
+    int getOffsetX() { return offsetX; }
+    int getOffsetY() { return offsetY; }
     Player *getPlayer() { return myPlayer; }
     void setPlayer(Player *player) { myPlayer = player; }
     void setOrigPixmap(QPixmap &pixmap) { orig_pixmap = new QPixmap(pixmap); }

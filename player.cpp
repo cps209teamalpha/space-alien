@@ -3,6 +3,7 @@
 #include "player.h"
 
 #include <QDebug>
+#include <QtMath>
 
 using namespace std;
 
@@ -22,6 +23,24 @@ void Player::move()
     // qDebug() << "Angle: " << angle << "(sin " << sin(angle * M_PI / 180) << ") yInc: " << yInc << "xInc: " << xInc << endl;
     x += xInc;
     y += yInc;
+
+    if (x >= 800)
+    {
+        x -= 800;
+    }
+    else if (x <= 0)
+    {
+        x += 800;
+    }
+
+    if (y >= 573)
+    {
+        y -= 573;
+    }
+    else if (y <= 0)
+    {
+        y += 573;
+    }
 }
 
 // Rotates the ship to the left
@@ -89,13 +108,50 @@ void Player::decelerate()
         speed = 0;
 }
 
-Phaser::Phaser(QWidget *parent,int init_angle, int initx, int inity): QLabel(parent) {
+Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): QLabel(parent) {
 
     x = initx;
     y = inity;
-    r = 2;
+
     angle = init_angle;
-    speed = 5;
-    dx = 10;
-    dy = 10;
+    rad = qDegreesToRadians(angle);
+    speed = 15;
+
+    double yInc;
+    if (angle >= 90 && angle <= 270)
+    {
+        yInc = sqrt(speed + (speed * sin(angle * M_PI / 180)));
+    }
+    else
+    {
+        yInc = -1 * sqrt(speed - (speed * sin(angle * M_PI / 180)));
+    }
+    double xInc = speed * sin(angle * M_PI / 180);
+
+    dx = xInc * 6;
+    dy = yInc * 6;
+
 }
+
+void Phaser::updatePhaser(Phaser *lblPew)
+{
+    double x = 0;
+    double y = 0;
+    x = lblPew->getX() + lblPew->getDX();
+    y = lblPew->getY() + lblPew->getDY();
+    lblPew->setX(x);
+    lblPew->setY(y);
+    lblPew->move(int(x), int(y));
+    if (lblPew->getX() >= 800)
+    {
+        lblPew->deleteLater();
+        qDebug() << "Phaser is deleted" << endl;
+    }
+
+    else if (lblPew->getY() >= 573)
+    {
+        lblPew->deleteLater();
+        qDebug() << "Phaser is deleted" << endl;
+    }
+}
+
