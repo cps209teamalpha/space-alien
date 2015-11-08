@@ -6,6 +6,8 @@
 #include <QTimer>
 
 #include "player.h"
+#include "alien.h"
+#include "game.h"
 
 namespace Ui {
 class MainWindow;
@@ -61,7 +63,7 @@ public:
         offsetX = 0;
         offsetY = 0;
     }
-    void playerGen(QPixmap pixmap, PlayerLabel *lblPlayer);
+    void playerGen(QPixmap pixmap);
 
     int getOffsetX() { return offsetX; }
     int getOffsetY() { return offsetY; }
@@ -76,6 +78,46 @@ public:
     }
 
     void rotate(int angle);
+
+};
+
+class AlienLabel : public QLabel
+{
+    Q_OBJECT
+
+    Alien *myAlien;
+
+public:
+    explicit AlienLabel(QWidget *parent): QLabel(parent) { }
+    Alien *getAlien() { return myAlien; }
+    void setAlien(Alien *alien) { myAlien = alien; }
+
+    ~AlienLabel()
+    {
+        delete myAlien;
+    }
+
+    void alienGen(QPixmap pixmap);
+
+};
+
+class ShotLabel : public QLabel
+{
+    Q_OBJECT
+
+    Shot *myShot;
+
+public:
+    explicit ShotLabel(QWidget *parent): QLabel(parent) { }
+    Shot *getShot() { return myShot; }
+    void setShot(Shot *shot) { myShot = shot; }
+
+    ~ShotLabel()
+    {
+        delete myShot;
+    }
+
+    void shotGen();
 
 };
 

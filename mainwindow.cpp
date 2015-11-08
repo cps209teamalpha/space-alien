@@ -34,16 +34,59 @@ int random_int(int min, int max) {
 }
 
 //Generates player onto the window
-void PlayerLabel::playerGen(QPixmap pixmap, PlayerLabel *lblPlayer)
+void PlayerLabel::playerGen(QPixmap pixmap)
 {
-    lblPlayer->setGeometry(380, 190, 41, 41);
-    lblPlayer->setPixmap(pixmap);
-    lblPlayer->setOrigPixmap(pixmap);
-    lblPlayer->setScaledContents(true);
-    lblPlayer->setAttribute(Qt::WA_TranslucentBackground, true);
+    setGeometry(getPlayer()->getX(), getPlayer()->getY(), 41, 41);
+    setPixmap(pixmap);
+    setOrigPixmap(pixmap);
+    setScaledContents(true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
 
-    lblPlayer->show();
-    lblPlayer->setFocus();
+    show();
+    setFocus();
+}
+
+void AlienLabel::alienGen(QPixmap pixmap)
+{
+    QTransform rotater;
+    switch(getAlien()->getRot())
+    {
+    case 90:
+        setGeometry(x(), y(), 55, 41);
+        rotater.rotate(90);
+        break;
+    case 180:
+        setGeometry(x(), y(), 41, 55);
+        rotater.rotate(180);
+        break;
+    case 270:
+        setGeometry(x(), y(), 55, 41);
+        rotater.rotate(270);
+        break;
+    default:
+        setGeometry(x(), y(), 41, 55);
+        break;
+    }
+
+    pixmap = pixmap.transformed(rotater);
+
+    setPixmap(pixmap);
+    setScaledContents(true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+
+    show();
+}
+
+void ShotLabel::shotGen()
+{
+    QPixmap pixmap(":/images/pew.png");
+
+    setGeometry(getShot()->getX(), getShot()->getY(), 20, 20);
+    setPixmap(pixmap);
+    setScaledContents(true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+
+    show();
 }
 
 //Rotates the player
@@ -114,14 +157,20 @@ void MainWindow::timerHit()
             }
             if (spacebarKeyPressed)
             {
-                Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getRot()),double(lblPlayer->x()
+                Game::instance()->addShot(double(lblPlayer->x() + 42), double(lblPlayer->y() + 42));
+
+                ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
+
+                lblShot->setShot(Game::instance()->getLastShot());
+                lblShot->shotGen();
+                /*Phaser *pew = new Phaser(ui->centralWidget,double(lblPlayer->getPlayer()->getRot()),double(lblPlayer->x()
                                               + 42), double(lblPlayer->y() + 42));
                 QPixmap bullet(":/images/pew.png");
                 pew->setPixmap(bullet);
                 pew->setGeometry(QRect(pew->getX(), pew->getY(), 20, 20));
                 pew->setScaledContents(true);
                 pew->setAttribute(Qt::WA_TranslucentBackground, true);
-                pew->show();
+                pew->show();*/
             }
 
             //Collision
@@ -143,6 +192,16 @@ void MainWindow::timerHit()
             }
 
         }
+        AlienLabel *lblAlien = dynamic_cast<AlienLabel *>(lbl);
+        if (lblAlien != nullptr)
+        {
+            lblAlien->move(lblAlien->getAlien()->getX(), lblAlien->getAlien()->getY());
+        }
+        ShotLabel *lblShot = dynamic_cast<ShotLabel *>(lbl);
+        if (lblShot != nullptr)
+        {
+            lblShot->move(lblShot->getShot()->getX(), lblShot->getShot()->getY());
+        }
         //Updates an Enemy's position
         Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
         if (lblEnemy != nullptr)
@@ -150,7 +209,7 @@ void MainWindow::timerHit()
             lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
         }
 
-        //Updates the Phaser's position that was just recently fired
+        /*//Updates the Phaser's position that was just recently fired
         Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
         if (lblPew != nullptr)
         {
@@ -171,7 +230,7 @@ void MainWindow::timerHit()
                }
            }
 
-        }
+        }*/
     }
 }
 
@@ -257,11 +316,26 @@ void MainWindow::on_btnPlay_clicked()
         alien->enemyGen(evil, alien, label_left, label_top);
     }
 
+    Game::instance()->addAlien(0);
+    Game::instance()->addAlien(90);
+    Game::instance()->addAlien(180);
+    Game::instance()->addAlien(270);
+
+    vector<Alien*> aliens = Game::instance()->getAliens();
+
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        AlienLabel *lblAlien = new AlienLabel(ui->centralWidget);
+        lblAlien->setAlien(aliens[i]);
+        QPixmap pixmap(":/images/alien1.png");
+        lblAlien->alienGen(pixmap);
+    }
+
     // Player set-up
     PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
     lblPlayer->setPlayer(Game::instance()->getPlayer());
     QPixmap pixmap(":/images/spaceship.png");
-    lblPlayer->playerGen(pixmap, lblPlayer); //Anyone can fix this if they like lol
+    lblPlayer->playerGen(pixmap);
 
     // Initialize timer:
     timer->setInterval(50);

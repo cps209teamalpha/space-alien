@@ -8,7 +8,7 @@
 // we may as well make it an object from
 // the start.
 
-class Player : public QLabel
+class Player
 {
 private:
     int rotation; // The direction the ship is pointing (360 degrees)

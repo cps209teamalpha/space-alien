@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "player.h"
+#include "alien.h"
 
 using namespace std;
 
@@ -21,6 +22,24 @@ public:
 
 class Highscores;
 
+class Shot
+{
+private:
+    int id;
+
+    int x,y;
+
+    int angle;
+public:
+    Shot(int startX, int startY, int ID): x(startX), y(startY), id(ID) { }
+
+    int getX() { return x; }
+    int getY() { return y; }
+    int getID() { return id; }
+
+    void move();
+};
+
 class Game : SavableObject
 {
 private:
@@ -30,6 +49,12 @@ private:
     // is enabled, more will be added.
     vector<Player*> players;
 
+    vector<Alien*> aliens;
+
+    vector<Shot*> shots;
+
+    int nextShot;
+
     Game();
 public:
     // Wipes the current game and reinstantiates
@@ -38,8 +63,22 @@ public:
     // Updates player & enemies, for use with a timer
     void updateField();
 
+    void addAlien(int rotation);
+
+    void addShot(int origX, int origY)
+    {
+        shots.push_back(new Shot(origX, origY, nextShot));
+        nextShot++;
+    }
+
+    void deleteShot(int shotID);
+
+    Shot *getLastShot() { return shots[shots.size() - 1]; }
+
     // For debug purposes only:
     Player *getPlayer() { return players[0]; }
+
+    vector<Alien*> getAliens() { return aliens; }
 
     // Methods to save/load game.
     // Talk to Mr. J about necessity of these
