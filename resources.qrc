@@ -13,5 +13,8 @@
         <file>images/spaceship.png</file>
         <file>images/energy.png</file>
         <file>images/pew.png</file>
+        <file>images/asteroidexlpode.wav</file>
+        <file>images/pew.wav</file>
+        <file>images/ripplayer.wav</file>
     </qresource>
 </RCC>

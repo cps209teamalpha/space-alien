@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QLabel>
 #include <QTimer>
+#include <QSound>
 
 #include "player.h"
 
@@ -16,6 +17,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     QTimer *timer = new QTimer(this);
+    //creating these now so they don't lag up the game to death
+    QSound *pewSound = new QSound(":/images/pew.wav");
+    QSound *riperinoPlayerino = new QSound(":/images/ripplayer.wav");
+     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
 
     bool upKeyPressed = false;
     bool downKeyPressed = false;
