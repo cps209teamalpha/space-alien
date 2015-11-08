@@ -1,6 +1,11 @@
 #include <vector>
 #include "game.h"
 #include "player.h"
+#include "alien.h"
+
+#ifndef M_PI
+#define M_PI (atan(1) * 4)
+#endif
 
 using namespace std;
 
@@ -10,6 +15,35 @@ Game::Game()
 {
     highscores = new Highscores();
     players.push_back(new Player(380, 190));
+    nextShot = 0;
+    shotTimer = 50;
+    untrackedShots = 0;
+}
+
+void Game::addAlien(int rotation)
+{
+    int startX, startY;
+    switch(rotation)
+    {
+    case 90:
+        startX = 740;
+        startY = 5;
+        break;
+    case 180:
+        startX = 740;
+        startY = 527;
+        break;
+    case 270:
+        startX = 5;
+        startY = 527;
+        break;
+    default:
+        startX = 5;
+        startY = 5;
+        break;
+    }
+
+    aliens.push_back(new Alien(startX, startY, rotation));
 }
 
 // Wipes the current game and reinstantiates
@@ -25,6 +59,15 @@ void Game::updateField()
     for (size_t i = 0; i < players.size(); i++)
     {
         players[i]->move();
+    }
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        aliens[i]->move();
+        aliens[i]->shoot();
+    }
+    for (size_t i = 0; i < shots.size(); i++)
+    {
+        shots[i]->move();
     }
 }
 
@@ -42,6 +85,23 @@ void Game::save()
 
 }
 
+void Game::deleteShot(int shotID)
+{
+    int index = -1;
+    for (size_t i = 0; i < shots.size(); i++)
+    {
+        if (shots[i]->getID() == shotID)
+        {
+            index = i;
+        }
+    }
+    if (index >= 0)
+    {
+        delete shots[index];
+        shots.erase(shots.begin() + index);
+    }
+}
+
 // Delete any pointers
 Game::~Game()
 {
@@ -49,6 +109,14 @@ Game::~Game()
     for (size_t i = 0; i < players.size(); i++)
     {
         delete players[i];
+    }
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        delete aliens[i];
+    }
+    for (size_t i = 0; i < shots.size(); i++)
+    {
+        delete shots[i];
     }
 }
 
@@ -61,6 +129,22 @@ Game *Game::instance()
         instance_ = new Game();
     }
     return instance_;
+}
+
+void Shot::move()
+{
+    double yInc;
+    if (angle >= 90 && angle <= 270)
+    {
+        yInc = sqrt(30 + (30 * sin(angle * M_PI / 180)));
+    }
+    else
+    {
+        yInc = -1 * sqrt(30 - (30 * sin(angle * M_PI / 180)));
+    }
+    double xInc = 30 * sin(angle * M_PI / 180);
+    x += xInc;
+    y += yInc;
 }
 
 // Default constructor for Highscore object
