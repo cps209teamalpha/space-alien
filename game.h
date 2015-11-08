@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "player.h"
+#include "alien.h"
 
 using namespace std;
 
@@ -21,6 +22,24 @@ public:
 
 class Highscores;
 
+class Shot
+{
+private:
+    int id;
+
+    int x,y;
+
+    int angle;
+public:
+    Shot(int startX, int startY, int startAngle, int ID): x(startX), y(startY), angle(startAngle), id(ID) { }
+
+    int getX() { return x; }
+    int getY() { return y; }
+    int getID() { return id; }
+
+    void move();
+};
+
 class Game : SavableObject
 {
 private:
@@ -30,6 +49,16 @@ private:
     // is enabled, more will be added.
     vector<Player*> players;
 
+    vector<Alien*> aliens;
+
+    vector<Shot*> shots;
+
+    int nextShot;
+
+    int shotTimer;
+
+    int untrackedShots;
+
     Game();
 public:
     // Wipes the current game and reinstantiates
@@ -38,8 +67,32 @@ public:
     // Updates player & enemies, for use with a timer
     void updateField();
 
+    void addAlien(int rotation);
+
+    void addUntrackedShot() { untrackedShots++; }
+
+    void setUntrackedShots(int amount) { untrackedShots = amount; }
+
+    int getUntrackedShots() { return untrackedShots; }
+
+    int getShotTimer() { return shotTimer; }
+
+    void addShot(int origX, int origY, int angle)
+    {
+        shots.push_back(new Shot(origX, origY, angle, nextShot));
+        nextShot++;
+    }
+
+    void deleteShot(int shotID);
+
+    Shot *getLastShot() { return shots[shots.size() - 1]; }
+
+    vector<Shot*> getShots() { return shots; }
+
     // For debug purposes only:
     Player *getPlayer() { return players[0]; }
+
+    vector<Alien*> getAliens() { return aliens; }
 
     // Methods to save/load game.
     // Talk to Mr. J about necessity of these
