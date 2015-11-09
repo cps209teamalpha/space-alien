@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QSound>
+#include <QString>
 
 #include "player.h"
 #include "alien.h"
@@ -44,6 +45,8 @@ public:
     void makeEnemies(int);
     bool noEnemiesLeft();
     void advanceLevel();
+    void hideGUI();
+    QString shipSelect();
 
 private slots:
     void timerHit();

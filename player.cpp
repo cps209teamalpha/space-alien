@@ -79,16 +79,6 @@ void Player::accelerate()
     if (speed > 15)
         speed = 15;
     angle = rotation;
-    /*if (speed == 0)
-    {
-        angle = rotation;
-        speed += 1;
-    }
-    else
-    {
-        // Ship is already moving; do calculations to change the
-        // angle of the drift and add speed in a new direction
-    }*/
 }
 
 // Decreases the ship's speed
@@ -108,6 +98,7 @@ void Player::decelerate()
         speed = 0;
 }
 
+//Creates a phaser
 Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): QLabel(parent) {
 
     x = initx;
@@ -115,7 +106,7 @@ Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): 
 
     angle = init_angle;
     rad = qDegreesToRadians(angle);
-    speed = 15;
+    speed = 20;
 
     double yInc;
     if (angle >= 90 && angle <= 270)
@@ -128,15 +119,27 @@ Phaser::Phaser(QWidget *parent, double init_angle, double initx, double inity): 
     }
     double xInc = speed * sin(angle * M_PI / 180);
 
-    dx = xInc * 6;
-    dy = yInc * 6;
+    dx = xInc * 5;
+    dy = yInc * 5;
 
 }
 
+//Generate phaser on window
+void Phaser::phaserGen(Phaser *pew, QPixmap bullet)
+{
+    pew->setPixmap(bullet);
+    pew->setGeometry(QRect(pew->getX(), pew->getY(), 20, 20));
+    pew->setScaledContents(true);
+    pew->setAttribute(Qt::WA_TranslucentBackground, true);
+    pew->show();
+}
+
+//Updates the current phaser's position
 void Phaser::updatePhaser(Phaser *lblPew)
 {
     double x = 0;
     double y = 0;
+
     x = lblPew->getX() + lblPew->getDX();
     y = lblPew->getY() + lblPew->getDY();
     lblPew->setX(x);

@@ -60,6 +60,7 @@ public:
 
     explicit Phaser(QWidget *parent,double init_angle, double initx, double inity);
     void updatePhaser(Phaser *lblPew);
+    void phaserGen(Phaser *pew, QPixmap bullet);
 
     double getX() { return x; }
     double getY() { return y; }

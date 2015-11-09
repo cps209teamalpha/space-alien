@@ -39,6 +39,49 @@ int random_int(int min, int max) {
     return distro(engine);
 }
 
+void MainWindow::hideGUI()
+{
+    // Hide Menu GUI
+    ui->lblMove->deleteLater();
+    ui->lblTitle->hide();
+    ui->btnPlay->hide();
+    ui->cbSound->hide();
+    ui->lblSpaceship2->hide();
+    ui->lblSpaceship3->hide();
+    ui->lblSpaceship4->hide();
+    ui->lblSpaceship5->hide();
+    ui->radioButton->hide();
+    ui->radioButton_2->hide();
+    ui->radioButton_3->hide();
+    ui->radioButton_4->hide();
+    ui->radioButton_5->hide();
+}
+
+QString MainWindow::shipSelect()
+{
+    //Allows the user to select a ship of their selection (BONUS)
+        if (ui->radioButton->isChecked())
+        {
+            return ":/images/spaceship.png";
+        }
+        else if (ui->radioButton_2->isChecked())
+        {
+            return ":/images/spaceship2.png";
+        }
+        else if (ui->radioButton_3->isChecked())
+        {
+            return ":/images/spaceship3.png";
+        }
+        else if (ui->radioButton_4->isChecked())
+        {
+            return ":/images/spaceship4.png";
+        }
+        else if (ui->radioButton_5->isChecked())
+        {
+            return ":/images/spaceship5.png";
+        }
+}
+
 //Generates player onto the window
 void PlayerLabel::playerGen(QPixmap pixmap)
 {
@@ -387,10 +430,7 @@ void MainWindow::on_btnPlay_clicked()
     Game::instance()->newGame();
 
     // Hide Menu GUI
-    ui->lblMove->deleteLater();
-    ui->lblTitle->hide();
-    ui->btnPlay->hide();
-    ui->cbSound->hide();
+    MainWindow::hideGUI();
 
     // Enemy set-up
     num_enemy = 5; //This amount for level 1 and PoC purposes
@@ -414,7 +454,7 @@ void MainWindow::on_btnPlay_clicked()
     // Player set-up
     PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
     lblPlayer->setPlayer(Game::instance()->getPlayer());
-    QPixmap pixmap(":/images/spaceship.png");
+    QPixmap pixmap(MainWindow::shipSelect());
     lblPlayer->playerGen(pixmap);
 
     // Initialize timer:
