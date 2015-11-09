@@ -1,6 +1,24 @@
 #include "alien.h"
 #include "game.h"
 
+#include <string>
+
+using namespace std;
+
+string Alien::getSave()
+{
+    string result = "A";
+    result += to_string(x);
+    result += ",";
+    result += to_string(y);
+    result += ",";
+    result += to_string(rotation);
+    result += ",";
+    result += to_string(timedShot);
+    result += "\n";
+    return result;
+}
+
 void Alien::move()
 {
     switch(rotation)

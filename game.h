@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <vector>
+#include <string>
 
 #include "player.h"
 #include "alien.h"
@@ -36,6 +37,8 @@ public:
     int getX() { return x; }
     int getY() { return y; }
     int getID() { return id; }
+
+    string getSave();
 
     void move();
 };
@@ -87,6 +90,7 @@ public:
 
     Shot *getLastShot() { return shots[shots.size() - 1]; }
 
+    vector<Player*> getPlayers() { return players; }
     vector<Shot*> getShots() { return shots; }
 
     // For debug purposes only:
