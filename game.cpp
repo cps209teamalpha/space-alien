@@ -16,8 +16,8 @@ using namespace std;
 Game::Game()
 {
     highscores = new Highscores();
-    players.push_back(new Player(380, 190));
     nextShot = 0;
+    nextAlien = 0;
     shotTimer = 50;
     untrackedShots = 0;
 }
@@ -45,7 +45,8 @@ void Game::addAlien(int rotation)
         break;
     }
 
-    aliens.push_back(new Alien(startX, startY, rotation));
+    aliens.push_back(new Alien(startX, startY, nextAlien, rotation));
+    nextAlien++;
 }
 
 // Wipes the current game and reinstantiates
@@ -56,6 +57,7 @@ void Game::newGame()
     aliens.clear();
     shots.clear();
     nextShot = 0;
+    nextAlien = 0;
     untrackedShots = 0;
 }
 
@@ -136,9 +138,10 @@ void Game::load()
                 vector<string> data = splitString(line, ',');
                 int x = stoi(data[0]);
                 int y = stoi(data[1]);
-                int rotation = stoi(data[2]);
-                int timedShot = stoi(data[3]);
-                aliens.push_back(new Alien(x, y, rotation));
+                int id = stoi(data[2]);
+                int rotation = stoi(data[3]);
+                int timedShot = stoi(data[4]);
+                aliens.push_back(new Alien(x, y, id, rotation));
                 aliens[aliens.size() - 1]->setTimedShot(timedShot);
                 break;
             }
@@ -199,6 +202,23 @@ void Game::deleteShot(int shotID)
     {
         delete shots[index];
         shots.erase(shots.begin() + index);
+    }
+}
+
+void Game::deleteAlien(int alienID)
+{
+    int index = -1;
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        if (aliens[i]->getID() == alienID)
+        {
+            index = i;
+        }
+    }
+    if (index >= 0)
+    {
+        delete aliens[index];
+        aliens.erase(aliens.begin() + index);
     }
 }
 
