@@ -12,6 +12,8 @@ string Alien::getSave()
     result += ",";
     result += to_string(y);
     result += ",";
+    result += to_string(id);
+    result += ",";
     result += to_string(rotation);
     result += ",";
     result += to_string(timedShot);

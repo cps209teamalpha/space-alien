@@ -112,7 +112,7 @@ public:
 
     ~AlienLabel()
     {
-        delete myAlien;
+        //delete myAlien;
     }
 
     void alienGen(QPixmap pixmap);
@@ -132,7 +132,9 @@ public:
 
     ~ShotLabel()
     {
-        delete myShot;
+        // Taken care of manually every time the
+        // label is deleted.
+        //delete myShot;
     }
 
     void shotGen();

@@ -57,6 +57,7 @@ private:
     vector<Shot*> shots;
 
     int nextShot;
+    int nextAlien; // Generates unique ids for the shots and aliens
 
     int shotTimer;
 
@@ -71,6 +72,7 @@ public:
     void updateField();
 
     void addAlien(int rotation);
+    void addPlayer(int x, int y) { players.push_back(new Player(x, y)); }
 
     void addUntrackedShot() { untrackedShots++; }
 
@@ -87,6 +89,7 @@ public:
     }
 
     void deleteShot(int shotID);
+    void deleteAlien(int alienID);
 
     Shot *getLastShot() { return shots[shots.size() - 1]; }
 
