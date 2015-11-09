@@ -4,8 +4,26 @@
 
 #include <QDebug>
 #include <QtMath>
+#include <string>
 
 using namespace std;
+
+// Returns a string to be saved to the save file
+string Player::getSave()
+{
+    string result = "P";
+    result += to_string(x);
+    result += ",";
+    result += to_string(y);
+    result += ",";
+    result += to_string(rotation);
+    result += ",";
+    result += to_string(speed);
+    result += ",";
+    result += to_string(angle);
+    result += "\n";
+    return result;
+}
 
 // Updates the player's position based on speed and direction
 void Player::move()

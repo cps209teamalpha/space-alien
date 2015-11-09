@@ -39,6 +39,75 @@ int random_int(int min, int max) {
     return distro(engine);
 }
 
+void MainWindow::resetGUI()
+{
+    // Clear playing field of UI elements:
+    QObjectList objList = ui->centralWidget->children();
+    for (QObject *lbl : objList)
+    {
+        PlayerLabel *lblPlayer = dynamic_cast<PlayerLabel *>(lbl);
+        if (lblPlayer != nullptr)
+        {
+            lblPlayer->deleteLater();
+        }
+        else
+        {
+            ShotLabel *lblShot = dynamic_cast<ShotLabel *>(lbl);
+            if (lblShot != nullptr)
+            {
+                lblShot->deleteLater();
+            }
+            else
+            {
+                AlienLabel *lblAlien = dynamic_cast<AlienLabel *>(lbl);
+                if (lblAlien != nullptr)
+                {
+                    lblAlien->deleteLater();
+                }
+                else
+                {
+                    PlayerLabel *lblPlayer = dynamic_cast<PlayerLabel *>(lbl);
+                    if (lblPlayer != nullptr)
+                    {
+                        lblPlayer->deleteLater();
+                    }
+                    else
+                    {
+                        // Should delete Enemies here, but they aren't
+                        // yet capable of being reloaded.
+                    }
+                }
+            }
+        }
+    }
+
+    // Generate new UI elements:
+    vector<Player*> players = Game::instance()->getPlayers();
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
+        lblPlayer->setPlayer(Game::instance()->getPlayer());
+        QPixmap pixmap(MainWindow::shipSelect());
+        lblPlayer->playerGen(pixmap);
+        lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+    }
+    vector<Alien*> aliens = Game::instance()->getAliens();
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        AlienLabel *lblAlien = new AlienLabel(ui->centralWidget);
+        lblAlien->setAlien(aliens[i]);
+        QPixmap pixmap(":/images/alien1.png");
+        lblAlien->alienGen(pixmap);
+    }
+    vector<Shot*> shots = Game::instance()->getShots();
+    for (size_t i = 0; i < shots.size(); i++)
+    {
+        ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
+        lblShot->setShot(shots[i]);
+        lblShot->shotGen();
+    }
+}
+
 void MainWindow::hideGUI()
 {
     // Hide Menu GUI
@@ -335,6 +404,7 @@ void MainWindow::timerHit()
             lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
         }
 
+        /*
         //Updates the Phaser's position that was just recently fired
         Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
         if (lblPew != nullptr)
@@ -362,7 +432,7 @@ void MainWindow::timerHit()
                   }
                }
            }
-        }
+        }*/
     }
 }
 
@@ -391,6 +461,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 break;
             case Qt::Key_Space:
                 spacebarKeyPressed = true;
+                break;
+            case Qt::Key_S:
+                Game::instance()->save();
+                break;
+            case Qt::Key_L:
+                Game::instance()->load();
+                resetGUI();
                 break;
             default:
                 break;

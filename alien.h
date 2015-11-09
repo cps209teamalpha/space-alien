@@ -1,6 +1,8 @@
 #ifndef ALIEN_H
 #define ALIEN_H
 
+#include <string>
+
 class Alien
 {
 private:
@@ -14,6 +16,10 @@ public:
     int getX() { return x; }
     int getY() { return y; }
     int getRot() { return rotation; }
+
+    void setTimedShot(int ts) { timedShot = ts; }
+
+    std::string getSave();
 
     // Updates the alien's position
     void move();
