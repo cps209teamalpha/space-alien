@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <QLabel>
+#include <string>
 
 // The player class. In mp mode, there
 // will be multiple player objects, so
@@ -16,7 +17,7 @@ private:
     int speed; // the current speed the ship is traveling at (may be rewritten)
     int angle; // the angle the ship is drifting at
 public:
-    Player(int startX, int startY): x(startX), y(startY), rotation(0), speed(0) { }
+    Player(int startX, int startY): x(startX), y(startY), rotation(0), speed(0), angle(0) { }
 
     // Accessor methods (mostly for debugging)
     int getX() { return x; }
@@ -24,6 +25,12 @@ public:
     int getRot() { return rotation; }
     int getAngle() { return angle; }
     int getSpeed() { return speed; }
+
+    void setRot(int rot) { rotation = rot; }
+    void setAngle(int ang) { angle = ang; }
+    void setSpeed(int spd) { speed = spd; }
+
+    std::string getSave();
 
     // Updates the player's position based on speed and angle
     void move();

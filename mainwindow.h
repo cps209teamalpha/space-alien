@@ -51,6 +51,8 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
+    void resetGUI();
+
     void makeEnemies(int);
     bool noEnemiesLeft();
     void advanceLevel();
