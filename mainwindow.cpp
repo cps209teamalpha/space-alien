@@ -1,19 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "enemyspawn.h"
-
-#include <QKeyEvent>
-#include <QDebug>
-#include <QLabel>
-#include <QPixmap>
-#include <QTransform>
-#include <QMatrix>
-
-#include "game.h"
-#include "player.h"
-#include "enemyspawn.h"
-#include <QMessageBox>
-#include <QSound>
 
 #ifndef M_PI
 #define M_PI (atan(1) * 4)
@@ -93,6 +79,17 @@ void PlayerLabel::playerGen(QPixmap pixmap)
 
     show();
     setFocus();
+}
+
+//Generates Mr. Jueckstock onto the window
+void BossLabel::bossGen(QPixmap pixmap)
+{
+    setGeometry(getBoss()->getX(), getBoss()->getY(), 139, 212);
+    setPixmap(pixmap);
+    setScaledContents(true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+
+    show();
 }
 
 void AlienLabel::alienGen(QPixmap pixmap)
@@ -433,6 +430,7 @@ void MainWindow::on_btnPlay_clicked()
     MainWindow::hideGUI();
 
     // Enemy set-up
+    /*
     num_enemy = 5; //This amount for level 1 and PoC purposes
     makeEnemies(num_enemy);
 
@@ -440,6 +438,19 @@ void MainWindow::on_btnPlay_clicked()
     Game::instance()->addAlien(90);
     Game::instance()->addAlien(180);
     Game::instance()->addAlien(270);
+    */
+
+    Game::instance()->addBoss();
+
+    vector<Boss*> bosses = Game::instance()->getBosses();
+
+    for (size_t i = 0; i < bosses.size(); i++) {
+        BossLabel *lblBoss = new BossLabel(ui->centralWidget);
+        lblBoss->setBoss(bosses.at(i));
+        QPixmap pixmap(":/images/mrj.png");
+        lblBoss->bossGen(pixmap);
+    }
+
 
     vector<Alien*> aliens = Game::instance()->getAliens();
 

@@ -6,10 +6,19 @@
 #include <QTimer>
 #include <QSound>
 #include <QString>
+#include <QKeyEvent>
+#include <QDebug>
+#include <QPixmap>
+#include <QTransform>
+#include <QMatrix>
+#include <QMessageBox>
+#include <QSound>
 
 #include "player.h"
 #include "alien.h"
+#include "boss.h"
 #include "game.h"
+#include "enemyspawn.h"
 
 namespace Ui {
 class MainWindow;
@@ -114,6 +123,26 @@ public:
     }
 
     void alienGen(QPixmap pixmap);
+
+};
+
+class BossLabel : public QLabel
+{
+    Q_OBJECT
+
+    Boss *myBoss;
+
+public:
+    explicit BossLabel(QWidget *parent): QLabel(parent) { }
+    Boss *getBoss() const { return myBoss; }
+    void setBoss(Boss *boss) { myBoss = boss; }
+
+    ~BossLabel()
+    {
+        delete myBoss;
+    }
+
+    void bossGen(QPixmap pixmap);
 
 };
 

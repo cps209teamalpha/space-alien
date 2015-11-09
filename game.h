@@ -5,6 +5,7 @@
 
 #include "player.h"
 #include "alien.h"
+#include "boss.h"
 
 using namespace std;
 
@@ -51,6 +52,8 @@ private:
 
     vector<Alien*> aliens;
 
+    vector<Boss*> bosses;
+
     vector<Shot*> shots;
 
     int nextShot;
@@ -66,6 +69,9 @@ public:
     void newGame();
     // Updates player & enemies, for use with a timer
     void updateField();
+
+    void addBoss();
+    void addBoss(double, double);
 
     void addAlien(int rotation);
 
@@ -93,6 +99,8 @@ public:
     Player *getPlayer() { return players[0]; }
 
     vector<Alien*> getAliens() { return aliens; }
+
+    vector<Boss*> getBosses() { return bosses; }
 
     // Methods to save/load game.
     // Talk to Mr. J about necessity of these
