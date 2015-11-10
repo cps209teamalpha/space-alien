@@ -61,6 +61,7 @@ public:
     bool noEnemiesLeft();
     void advanceLevel();
     void hideGUI();
+    void showGUI();
     QString shipSelect();
 
     void sendGameData(QTcpSocket *sock);
@@ -101,7 +102,7 @@ public:
         offsetX = 0;
         offsetY = 0;
     }
-    void playerGen(QPixmap pixmap);
+    void playerGen();
 
     int getOffsetX() { return offsetX; }
     int getOffsetY() { return offsetY; }

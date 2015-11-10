@@ -17,6 +17,8 @@ string Player::getSave()
     result += to_string(angle);
     result += ",";
     result += peerName.toStdString();
+    result += ",";
+    result += pixmapName.toStdString();
     result += "\n";
     return result;
 }
