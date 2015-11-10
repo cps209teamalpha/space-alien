@@ -64,7 +64,7 @@ public:
     void hideGUI();
     QString shipSelect();
 
-    void sendGameData();
+    void sendGameData(QTcpSocket *sock);
 
 private slots:
     void timerHit();

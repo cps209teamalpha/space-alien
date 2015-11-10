@@ -54,7 +54,7 @@ void MainWindow::clientConnected()
     lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
     QPixmap pixmap(":" + initData[1]);
     lblPlayer->playerGen(pixmap);
-    sendGameData();
+    sendGameData(sock);
 }
 
 void MainWindow::clientDisconnected()
@@ -92,62 +92,71 @@ void MainWindow::dataReceived()
 {
     QTcpSocket *sock = dynamic_cast<QTcpSocket*>(sender());
     QString str = sock->readLine();
-    if (ui->rbClient->isChecked() && (synching || (str == "SYNCH")))
+    if (str == "SYNCH\n")//(ui->rbClient->isChecked() && (synching || (str == "SYNCH")))
     {
-        if (str == "SYNCH")
+        while (str != "SYNCHEND\n")
         {
-            Game::instance()->newGame();
-            synching = true;
+            if (str == "SYNCH\n")
+            {
+                Game::instance()->newGame();
+                synching = true;
+            }
+            else if (str == "SYNCHEND\n")
+            {
+                synching = false;
+                resetGUI();
+            }
+            else
+            {
+                string line = str.toStdString();
+                qDebug() << str << endl;
+                switch (line[0])
+                {
+                case 'P':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int rotation = stoi(data[2]);
+                    int speed = stoi(data[3]);
+                    int angle = stoi(data[4]);
+                    QString name = QString::fromStdString(data[5]);
+                    Game::instance()->addPlayer(x, y, name);
+                    Game::instance()->getPlayer(name)->setRot(rotation);
+                    Game::instance()->getPlayer(name)->setSpeed(speed);
+                    Game::instance()->getPlayer(name)->setAngle(angle);
+                    break;
+                }
+                case 'A':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int id = stoi(data[2]);
+                    int rotation = stoi(data[3]);
+                    int timedShot = stoi(data[4]);
+                    Game::instance()->addNewAlien(x, y, id, rotation);
+                    Game::instance()->getAlien(id)->setTimedShot(timedShot);
+                    break;
+                }
+                case 'S':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int angle = stoi(data[2]);
+                    int id = stoi(data[3]);
+                    Game::instance()->addOldShot(x, y, angle, id);
+                    break;
+                }
+                }
+            }
+            str = sock->readLine();
         }
-        else if (str == "SYNCHEND")
-        {
-            synching = false;
-            resetGUI();
-        }
-        string line = str.toStdString();
-        switch (line[0])
-        {
-        case 'P':
-        {
-            line = line.substr(1, line.size() - 1);
-            vector<string> data = splitString(line, ',');
-            int x = stoi(data[0]);
-            int y = stoi(data[1]);
-            int rotation = stoi(data[2]);
-            int speed = stoi(data[3]);
-            int angle = stoi(data[4]);
-            QString name = QString::fromStdString(data[5]);
-            Game::instance()->addPlayer(x, y, name);
-            Game::instance()->getPlayer(name)->setRot(rotation);
-            Game::instance()->getPlayer(name)->setSpeed(speed);
-            Game::instance()->getPlayer(name)->setAngle(angle);
-            break;
-        }
-        case 'A':
-        {
-            line = line.substr(1, line.size() - 1);
-            vector<string> data = splitString(line, ',');
-            int x = stoi(data[0]);
-            int y = stoi(data[1]);
-            int id = stoi(data[2]);
-            int rotation = stoi(data[3]);
-            int timedShot = stoi(data[4]);
-            Game::instance()->addNewAlien(x, y, id, rotation);
-            Game::instance()->getAlien(id)->setTimedShot(timedShot);
-            break;
-        }
-        case 'S':
-        {
-            line = line.substr(1, line.size() - 1);
-            vector<string> data = splitString(line, ',');
-            int x = stoi(data[0]);
-            int y = stoi(data[1]);
-            int angle = stoi(data[2]);
-            int id = stoi(data[3]);
-            Game::instance()->addOldShot(x, y, angle, id);
-            break;
-        }
-        }
+        resetGUI();
     }
     else
     {
@@ -626,7 +635,7 @@ void MainWindow::timerHit()
                 {
                     QString msg = "SHT:" + ui->lnPeerName->text();
                     socket->write(msg.toLocal8Bit());
-		    //setting the shot as false (player shot)
+                    //setting the shot as false (player shot)
                     Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
@@ -640,7 +649,7 @@ void MainWindow::timerHit()
                 }
                 else if (ui->rbServer->isChecked())
                 {
-		    //setting the shot as false (player shot)
+                    //setting the shot as false (player shot)
                     Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
@@ -661,7 +670,7 @@ void MainWindow::timerHit()
                 }
                 else
                 {
-		    //setting the shot as false (player shot)
+                    //setting the shot as false (player shot)
                     Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
@@ -865,35 +874,32 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
 }
 
 // Sends out the game data to all clients
-void MainWindow::sendGameData()
+void MainWindow::sendGameData(QTcpSocket *sock)
 {
-    for (QObject *obj : server->children()) {
-        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
-        if (anotherSock != nullptr) {
-    QString msg = "SYNCH";
-    anotherSock->write(msg.toLocal8Bit());
+        if (sock != nullptr) {
+    QString msg = "SYNCH\n";
+    sock->write(msg.toLocal8Bit());
     vector<Player*> players = Game::instance()->getPlayers();
     vector<Shot*> shots = Game::instance()->getShots();
     vector<Alien*> aliens = Game::instance()->getAliens();
     for (size_t i = 0; i < players.size(); i++)
     {
-        QString msg = QString::fromStdString(players[i]->getSave());
-        anotherSock->write(msg.toLocal8Bit());
+        msg = QString::fromStdString(players[i]->getSave());
+        sock->write(msg.toLocal8Bit());
     }
     for (size_t i = 0; i < shots.size(); i++)
     {
-        QString msg = QString::fromStdString(shots[i]->getSave());
-        anotherSock->write(msg.toLocal8Bit());
+        msg = QString::fromStdString(shots[i]->getSave());
+        sock->write(msg.toLocal8Bit());
     }
     for (size_t i = 0; i < aliens.size(); i++)
     {
-        QString msg = QString::fromStdString(aliens[i]->getSave());
-        anotherSock->write(msg.toLocal8Bit());
+        msg = QString::fromStdString(aliens[i]->getSave());
+        sock->write(msg.toLocal8Bit());
     }
-    msg = "SYNCHEND";
-    anotherSock->write(msg.toLocal8Bit());
+    msg = "SYNCHEND\n";
+    sock->write(msg.toLocal8Bit());
         }
-    }
 }
 
 void MainWindow::on_btnPlay_clicked()
