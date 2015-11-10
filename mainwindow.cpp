@@ -1,20 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "enemyspawn.h"
-
-#include <QKeyEvent>
-#include <QDebug>
-#include <QLabel>
-#include <QPixmap>
-#include <QTransform>
-#include <QMatrix>
-#include <QTcpSocket>
-
-#include "game.h"
-#include "player.h"
-#include "enemyspawn.h"
-#include <QMessageBox>
-#include <QSound>
 
 #ifndef M_PI
 #define M_PI (atan(1) * 4)
