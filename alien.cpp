@@ -63,7 +63,8 @@ void Alien::shoot()
     {
         int shotAngle = rotation + 180;
         if (shotAngle >= 360) shotAngle -= 360;
-        Game::instance()->addShot(x, y, shotAngle);
+        //now sets shot as true for alien shot
+        Game::instance()->addShot(x, y, shotAngle, true);
         timedShot = 0;
         Game::instance()->addUntrackedShot();
     }

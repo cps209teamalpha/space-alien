@@ -8,6 +8,7 @@
 
 #include "player.h"
 #include "alien.h"
+#include "boss.h"
 
 using namespace std;
 
@@ -32,7 +33,7 @@ class Shot
 {
 private:
     int id;
-
+    bool isAlienShot; //used to differentiate between player lasers and alien lasers
     int x,y;
 
     int angle;
@@ -42,7 +43,9 @@ public:
     int getX() { return x; }
     int getY() { return y; }
     int getID() { return id; }
-
+    //obvious mutator and accessor methods
+    void setIsAlienShot(bool set) { isAlienShot = set; }
+    bool getIsAlienShot() { return isAlienShot; }
     string getSave();
 
     void move();
@@ -51,6 +54,10 @@ public:
 class Game : SavableObject
 {
 private:
+    int currentLevel = 1; // don't know if this is the right place to put it
+    int num_enemy = 5;
+    int currentEnemies = 0;
+
     Highscores *highscores;
     // All the players in the game.
     // Normally one; if network support
@@ -58,6 +65,8 @@ private:
     vector<Player*> players;
 
     vector<Alien*> aliens;
+
+    vector<Boss*> bosses;
 
     vector<Shot*> shots;
 
@@ -76,6 +85,13 @@ public:
     // Updates player & enemies, for use with a timer
     void updateField();
 
+    int &Num_enemy() { return num_enemy; }
+    int &CurrentLevel() { return currentLevel; }
+    int &CurrentEnemies() { return currentEnemies; }
+
+    void addBoss();
+    void addBoss(double, double);
+
     void addAlien(int rotation);
     void addNewAlien(int x, int y, int id, int rotation) { aliens.push_back(new Alien(x, y, id, rotation)); }
     void addOldShot(int x, int y, int angle, int id) { shots.push_back(new Shot(x, y, angle, id)); }
@@ -89,9 +105,11 @@ public:
 
     int getShotTimer() { return shotTimer; }
 
-    void addShot(int origX, int origY, int angle)
+    void addShot(int origX, int origY, int angle, bool isShotAlien)
     {
         shots.push_back(new Shot(origX, origY, angle, nextShot));
+        Shot *foo = shots.back();
+        foo->setIsAlienShot(isShotAlien);
         nextShot++;
     }
 
@@ -110,6 +128,8 @@ public:
     Player *getPlayer(QString name);
 
     vector<Alien*> getAliens() { return aliens; }
+
+    vector<Boss*> getBosses() { return bosses; }
 
     // Methods to save/load game.
     // Talk to Mr. J about necessity of these

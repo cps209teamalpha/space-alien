@@ -178,7 +178,7 @@ void MainWindow::dataReceived()
                 }
                 if ((data[0] == "SHT") && (lblPlayer->getPlayer()->getPeerName() == data[1]) && (!ui->rbClient->isChecked() || (data[1] != ui->lnPeerName->text())))
                 {
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -334,6 +334,17 @@ void PlayerLabel::playerGen(QPixmap pixmap)
     setFocus();
 }
 
+//Generates Mr. Jueckstock onto the window
+void BossLabel::bossGen(QPixmap pixmap)
+{
+    setGeometry(getBoss()->getX(), getBoss()->getY(), 139, 212);
+    setPixmap(pixmap);
+    setScaledContents(true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+
+    show();
+}
+
 void AlienLabel::alienGen(QPixmap pixmap)
 {
     QTransform rotater;
@@ -373,7 +384,6 @@ void ShotLabel::shotGen()
     setPixmap(pixmap);
     setScaledContents(true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-
     show();
 }
 
@@ -425,20 +435,76 @@ void MainWindow::makeEnemies(int num_enemy) {
         Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
         QPixmap evil(":/images/asteroid.png");
         alien->enemyGen(evil, alien, label_left, label_top);
-        ++currentEnemies;
+        Game::instance()->CurrentEnemies() += 1;
     }
 }
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (currentEnemies == 0) return true;
+    if (Game::instance()->CurrentEnemies() == 0) return true;
     else                     return false;
 }
 
 // lazy level implementation
 void MainWindow::advanceLevel() {
-    currentLevel += 1;
-    makeEnemies(num_enemy * currentLevel);
+    //Plays a sound before level advances
+    levelUp->play();
+
+    //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
+        congratsLabel = new QLabel(this);
+    congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
+        congratsLabel->adjustSize();
+        congratsLabel->move(230, 270);
+    congratsLabel->show();
+
+    connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
+    congratsLabelTimer->start(3000);
+
+
+    ++Game::instance()->CurrentLevel();
+    int lvl = Game::instance()->CurrentLevel();
+
+    // consider moving the following lines into a function?
+    // does the same thing as init
+
+    if(Game::instance()->CurrentLevel() == 5) {
+        Game::instance()->addBoss(50, 50);
+
+        vector<Boss*> bosses = Game::instance()->getBosses();
+
+        for (size_t i = 0; i < bosses.size(); i++) {
+            BossLabel *lblBoss = new BossLabel(ui->centralWidget);
+            lblBoss->setBoss(bosses.at(i));
+            QPixmap pixmap(":/images/mrj.png");
+            lblBoss->bossGen(pixmap);
+        }
+    }
+    else {
+        makeEnemies(Game::instance()->Num_enemy() * Game::instance()->CurrentLevel());
+        Game::instance()->addAlien(0);
+        Game::instance()->addAlien(90);
+        Game::instance()->addAlien(180);
+        Game::instance()->addAlien(270);
+
+        vector<Alien*> aliens = Game::instance()->getAliens();
+
+        for (size_t i = 0; i < aliens.size(); i++)
+        {
+            AlienLabel *lblAlien = new AlienLabel(ui->centralWidget);
+            lblAlien->setAlien(aliens[i]);
+            QPixmap pixmap(":/images/alien1.png");
+            lblAlien->alienGen(pixmap);
+        }
+    }
+
+}
+
+void MainWindow::hideMessage()
+{
+    //slot to hide the msg and stop the timer.
+    congratsLabel->hide();
+    congratsLabelTimer->stop();
+
 }
 
 //Performs different operations on each timer event
@@ -560,7 +626,8 @@ void MainWindow::timerHit()
                 {
                     QString msg = "SHT:" + ui->lnPeerName->text();
                     socket->write(msg.toLocal8Bit());
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
+		    //setting the shot as false (player shot)
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -573,7 +640,8 @@ void MainWindow::timerHit()
                 }
                 else if (ui->rbServer->isChecked())
                 {
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
+		    //setting the shot as false (player shot)
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -593,7 +661,8 @@ void MainWindow::timerHit()
                 }
                 else
                 {
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
+		    //setting the shot as false (player shot)
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -626,6 +695,24 @@ void MainWindow::timerHit()
                        QApplication::quit();
                    }
                 }
+                //Collision for the player when hit by alien lasers. Only dies from alien shots.
+                 ShotLabel *lblShot = dynamic_cast<ShotLabel *>(objList[i]);
+
+                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true)
+                 {
+                     if (lblPlayer->x() < (lblShot->x() + (lblShot->width() / 2)) &&
+                             (lblPlayer->x() + lblPlayer->width()) > lblShot->x() &&
+                             lblPlayer->y() < (lblShot->y() + (lblShot->height() / 2)) &&
+                             ((lblPlayer->height() / 2) + lblPlayer->y()) > lblShot->y())
+                     {
+                         if (ui->cbSound->isChecked())
+                         {
+                             riperinoPlayerino->play();
+                         }
+                         QMessageBox::information(this, "", "You have been DESTROYED!");
+                         QApplication::quit();
+                     }
+                 }
             }
 
         }
@@ -680,7 +767,7 @@ void MainWindow::timerHit()
                        test->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
                        lblShot->deleteLater();
-                       --currentEnemies;
+                       --Game::instance()->CurrentEnemies();
                        if(noEnemiesLeft()) {
                            advanceLevel();
                        }
@@ -703,6 +790,10 @@ void MainWindow::timerHit()
                        alienTest->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
                        lblShot->deleteLater();
+                       --Game::instance()->CurrentEnemies();
+                       if(noEnemiesLeft()) {
+                           advanceLevel();
+                       }
                    }
                 }
             }
@@ -864,13 +955,26 @@ void MainWindow::on_btnPlay_clicked()
     MainWindow::hideGUI();
 
     // Enemy set-up
-    num_enemy = 5; //This amount for level 1 and PoC purposes
-    makeEnemies(num_enemy);
+    Game::instance()->Num_enemy() = 5; //This amount for level 1 and PoC purposes
+    makeEnemies(Game::instance()->Num_enemy());
 
     Game::instance()->addAlien(0);
     Game::instance()->addAlien(90);
     Game::instance()->addAlien(180);
     Game::instance()->addAlien(270);
+
+    // Summons Mr. Jueckstock to the battlefield
+    //Game::instance()->addBoss();
+
+    vector<Boss*> bosses = Game::instance()->getBosses();
+
+    for (size_t i = 0; i < bosses.size(); i++) {
+        BossLabel *lblBoss = new BossLabel(ui->centralWidget);
+        lblBoss->setBoss(bosses.at(i));
+        QPixmap pixmap(":/images/mrj.png");
+        lblBoss->bossGen(pixmap);
+    }
+
 
     vector<Alien*> aliens = Game::instance()->getAliens();
 

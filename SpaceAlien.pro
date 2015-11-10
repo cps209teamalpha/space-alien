@@ -17,14 +17,16 @@ SOURCES += main.cpp\
     game.cpp \
     player.cpp \
     enemyspawn.cpp \
-    alien.cpp
+    alien.cpp \
+    boss.cpp
 
 
 HEADERS  += mainwindow.h \
     game.h \
     player.h \
     enemyspawn.h \
-    alien.h
+    alien.h \
+    boss.h
 
 FORMS    += mainwindow.ui
 

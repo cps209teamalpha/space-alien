@@ -4,8 +4,6 @@
 #include <fstream>
 #include <string>
 #include "game.h"
-#include "player.h"
-#include "alien.h"
 
 #ifndef M_PI
 #define M_PI (atan(1) * 4)
@@ -59,7 +57,16 @@ void Game::addAlien(int rotation)
     }
 
     aliens.push_back(new Alien(startX, startY, nextAlien, rotation));
+    currentEnemies++;
     nextAlien++;
+}
+
+void Game::addBoss() {
+    bosses.emplace_back(new Boss());
+}
+
+void Game::addBoss(double X, double Y) {
+    bosses.emplace_back(new Boss(X, Y));
 }
 
 // Wipes the current game and reinstantiates

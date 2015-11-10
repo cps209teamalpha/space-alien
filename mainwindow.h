@@ -8,10 +8,19 @@
 #include <QString>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QKeyEvent>
+#include <QDebug>
+#include <QPixmap>
+#include <QTransform>
+#include <QMatrix>
+#include <QMessageBox>
+#include <QSound>
 
 #include "player.h"
 #include "alien.h"
+#include "boss.h"
 #include "game.h"
+#include "enemyspawn.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,10 +30,6 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    int currentLevel = 1; // don't know if this is the right place to put it
-    int num_enemy = 5;
-    int currentEnemies = 0;
-
     QTimer *timer = new QTimer(this);
     //creating these now so they don't lag up the game to death
     QSound *pewSound = new QSound(":/images/pew.wav");
@@ -32,6 +37,9 @@ class MainWindow : public QMainWindow
     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
     QTcpServer* server;
     QTcpSocket* socket;
+     QSound *levelUp = new QSound(":/images/levelAccomplished.wav");
+     QTimer *congratsLabelTimer = new QTimer(this);
+     QLabel *congratsLabel;
 
     bool upKeyPressed = false;
     bool downKeyPressed = false;
@@ -60,7 +68,7 @@ public:
 
 private slots:
     void timerHit();
-
+    void hideMessage();
     void on_btnPlay_clicked();
 
     void clientConnected();
@@ -129,6 +137,26 @@ public:
     }
 
     void alienGen(QPixmap pixmap);
+
+};
+
+class BossLabel : public QLabel
+{
+    Q_OBJECT
+
+    Boss *myBoss;
+
+public:
+    explicit BossLabel(QWidget *parent): QLabel(parent) { }
+    Boss *getBoss() const { return myBoss; }
+    void setBoss(Boss *boss) { myBoss = boss; }
+
+    ~BossLabel()
+    {
+        delete myBoss;
+    }
+
+    void bossGen(QPixmap pixmap);
 
 };
 

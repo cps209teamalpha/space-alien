@@ -20,5 +20,8 @@
         <file>images/spaceship5.png</file>
         <file>images/spaceship3.png</file>
         <file>images/spaceship4.png</file>
+        <file>images/mrj.png</file>
+        <file>images/mrj2.png</file>
+        <file>images/levelAccomplished.wav</file>
     </qresource>
 </RCC>
