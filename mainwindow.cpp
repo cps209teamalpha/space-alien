@@ -200,7 +200,6 @@ void ShotLabel::shotGen()
     setPixmap(pixmap);
     setScaledContents(true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-
     show();
 }
 
@@ -264,8 +263,31 @@ bool MainWindow::noEnemiesLeft() {
 
 // lazy level implementation
 void MainWindow::advanceLevel() {
-    currentLevel += 1;
+    //Plays a sound before level advances
+    levelUp->play();
+
+    //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
+        congratsLabel = new QLabel(this);
+    congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
+        congratsLabel->adjustSize();
+        congratsLabel->move(230, 270);
+    congratsLabel->show();
+
+    connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
+    congratsLabelTimer->start(3000);
+
+
+    ++currentLevel;
+
     makeEnemies(num_enemy * currentLevel);
+}
+
+void MainWindow::hideMessage()
+{
+    //slot to hide the msg and stop the timer.
+    congratsLabel->hide();
+    congratsLabelTimer->stop();
+
 }
 
 //Performs different operations on each timer event
@@ -299,7 +321,9 @@ void MainWindow::timerHit()
             }
             if (spacebarKeyPressed)
             {
-                Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
+                //setting the shot as false (player shot)
+                Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+
 
                 ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -331,6 +355,24 @@ void MainWindow::timerHit()
                        QApplication::quit();
                    }
                 }
+                //Collision for the player when hit by alien lasers. Only dies from alien shots.
+                 ShotLabel *lblShot = dynamic_cast<ShotLabel *>(objList[i]);
+
+                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true)
+                 {
+                     if (lblPlayer->x() < (lblShot->x() + (lblShot->width() / 2)) &&
+                             (lblPlayer->x() + lblPlayer->width()) > lblShot->x() &&
+                             lblPlayer->y() < (lblShot->y() + (lblShot->height() / 2)) &&
+                             ((lblPlayer->height() / 2) + lblPlayer->y()) > lblShot->y())
+                     {
+                         if (ui->cbSound->isChecked())
+                         {
+                             riperinoPlayerino->play();
+                         }
+                         QMessageBox::information(this, "", "You have been DESTROYED!");
+                         QApplication::quit();
+                     }
+                 }
             }
 
         }
@@ -364,12 +406,8 @@ void MainWindow::timerHit()
                 (lblShot->getShot()->getY() >= 573) ||
                 (lblShot->getShot()->getY() <= 0))
             {
-                // For some reason deleting the label causes the program to crash.
-                // Deleting the shot will cause the label to remain on-screen.
-                // Keeping it around means it's still flying off-screen: could
-                // cause some performance issues (or unexpected bugs)
-                //Game::instance()->deleteShot(lblShot->getShot()->getID());
-                //lblShot->deleteLater();
+                Game::instance()->deleteShot(lblShot->getShot()->getID());
+                lblShot->deleteLater();
             }
             for (int i = 0; i < objList.size(); i++)
             {
@@ -387,9 +425,31 @@ void MainWindow::timerHit()
                            ripAsteroid->play();
                        }
                        test->deleteLater();
-                       // Causes errors - see above
-                       //Game::instance()->deleteShot(lblShot->getShot()->getID());
-                       //lblShot->deleteLater();
+                       Game::instance()->deleteShot(lblShot->getShot()->getID());
+                       lblShot->deleteLater();
+                       --currentEnemies;
+                       if(noEnemiesLeft()) {
+                           advanceLevel();
+                       }
+                   }
+                }
+                AlienLabel *alienTest = dynamic_cast<AlienLabel *>(objList[i]);
+                if (alienTest != nullptr)
+                {
+                   if (lblShot->x() < (alienTest->x() + (alienTest->width() / 2)) &&
+                           (lblShot->x() + lblShot->width()) > alienTest->x() &&
+                           lblShot->y() < (alienTest->y() + (alienTest->height() / 2)) &&
+                           ((lblShot->height() / 2) + lblShot->y()) > alienTest->y())
+
+                   {
+                       if (ui->cbSound->isChecked())
+                       {
+                           ripAsteroid->play();
+                       }
+                       Game::instance()->deleteAlien(alienTest->getAlien()->getID());
+                       alienTest->deleteLater();
+                       Game::instance()->deleteShot(lblShot->getShot()->getID());
+                       lblShot->deleteLater();
                    }
                 }
             }
@@ -400,76 +460,38 @@ void MainWindow::timerHit()
         {
             lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
         }
-
-        /*
-        //Updates the Phaser's position that was just recently fired
-        Phaser *lblPew = dynamic_cast<Phaser *>(lbl);
-        if (lblPew != nullptr)
-        {
-           lblPew->updatePhaser(lblPew); //Same here
-           for (int i = 0; i < objList.size(); i++)
-           {
-               Enemy *test = dynamic_cast<Enemy *>(objList[i]);
-               if (test != nullptr)
-               {
-                  if (lblPew->x < (test->x() + (test->width() / 2)) &&
-                          (lblPew->x + lblPew->width()) > test->x() &&
-                          lblPew->y < (test->y() + (test->height() / 2)) &&
-                          ((lblPew->height() / 2) + lblPew->y) > test->y())
-
-                  {
-                      ripAsteroid->play();
-                      test->deleteLater();
-                      --currentEnemies;
-                      lblPew->deleteLater();
-
-                      if(noEnemiesLeft()) {
-                          advanceLevel();
-                      }
-                  }
-               }
-           }
-        }*/
     }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     //Sets a key variable true if pressed
-    QObjectList objList = ui->centralWidget->children();
-    for (QObject *lbl : objList)
+    switch (event->key())
     {
-        PlayerLabel *lblPlayer = dynamic_cast<PlayerLabel *>(lbl);
-        if (lblPlayer != nullptr)
-        {
-            switch (event->key())
-            {
-            case Qt::Key_Up:
-                upKeyPressed = true;
-                break;
-            case Qt::Key_Down:
-                downKeyPressed = true;
-                break;
-            case Qt::Key_Left:
-                leftKeyPressed = true;
-                break;
-            case Qt::Key_Right:
-                rightKeyPressed = true;
-                break;
-            case Qt::Key_Space:
-                spacebarKeyPressed = true;
-                break;
-            case Qt::Key_S:
-                Game::instance()->save();
-                break;
-            case Qt::Key_L:
-                Game::instance()->load();
-                resetGUI();
-                break;
-            default:
-                break;
-            }
-        }
+    case Qt::Key_Up:
+        upKeyPressed = true;
+        break;
+    case Qt::Key_Down:
+        downKeyPressed = true;
+        break;
+    case Qt::Key_Left:
+        leftKeyPressed = true;
+        break;
+    case Qt::Key_Right:
+        rightKeyPressed = true;
+        break;
+    case Qt::Key_Space:
+        spacebarKeyPressed = true;
+        break;
+    case Qt::Key_S:
+        Game::instance()->save();
+        break;
+    case Qt::Key_L:
+        Game::instance()->load();
+        resetGUI();
+        break;
+    default:
+        break;
     }
 }
 
@@ -507,7 +529,6 @@ void MainWindow::on_btnPlay_clicked()
     MainWindow::hideGUI();
 
     // Enemy set-up
-    /*
     num_enemy = 5; //This amount for level 1 and PoC purposes
     makeEnemies(num_enemy);
 
@@ -515,9 +536,9 @@ void MainWindow::on_btnPlay_clicked()
     Game::instance()->addAlien(90);
     Game::instance()->addAlien(180);
     Game::instance()->addAlien(270);
-    */
 
-    Game::instance()->addBoss();
+    // Summons Mr. Jueckstock to the battlefield
+    //Game::instance()->addBoss();
 
     vector<Boss*> bosses = Game::instance()->getBosses();
 
@@ -538,6 +559,8 @@ void MainWindow::on_btnPlay_clicked()
         QPixmap pixmap(":/images/alien1.png");
         lblAlien->alienGen(pixmap);
     }
+
+    Game::instance()->addPlayer(380, 190);
 
     // Player set-up
     PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
