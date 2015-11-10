@@ -251,13 +251,13 @@ void MainWindow::makeEnemies(int num_enemy) {
         Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
         QPixmap evil(":/images/asteroid.png");
         alien->enemyGen(evil, alien, label_left, label_top);
-        ++currentEnemies;
+        Game::instance()->CurrentEnemies() += 1;
     }
 }
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (currentEnemies == 0) return true;
+    if (Game::instance()->CurrentEnemies() == 0) return true;
     else                     return false;
 }
 
@@ -277,9 +277,9 @@ void MainWindow::advanceLevel() {
     congratsLabelTimer->start(3000);
 
 
-    ++currentLevel;
+    ++Game::instance()->CurrentLevel();
 
-    makeEnemies(num_enemy * currentLevel);
+    makeEnemies(Game::instance()->Num_enemy() * Game::instance()->CurrentLevel());
 }
 
 void MainWindow::hideMessage()
@@ -427,7 +427,7 @@ void MainWindow::timerHit()
                        test->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
                        lblShot->deleteLater();
-                       --currentEnemies;
+                       --Game::instance()->CurrentEnemies();
                        if(noEnemiesLeft()) {
                            advanceLevel();
                        }
@@ -529,8 +529,8 @@ void MainWindow::on_btnPlay_clicked()
     MainWindow::hideGUI();
 
     // Enemy set-up
-    num_enemy = 5; //This amount for level 1 and PoC purposes
-    makeEnemies(num_enemy);
+    Game::instance()->Num_enemy() = 5; //This amount for level 1 and PoC purposes
+    makeEnemies(Game::instance()->Num_enemy());
 
     Game::instance()->addAlien(0);
     Game::instance()->addAlien(90);

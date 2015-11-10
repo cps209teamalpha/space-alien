@@ -49,6 +49,10 @@ public:
 class Game : SavableObject
 {
 private:
+    int currentLevel = 1; // don't know if this is the right place to put it
+    int num_enemy = 5;
+    int currentEnemies = 0;
+
     Highscores *highscores;
     // All the players in the game.
     // Normally one; if network support
@@ -75,6 +79,10 @@ public:
     void newGame();
     // Updates player & enemies, for use with a timer
     void updateField();
+
+    int &Num_enemy() { return num_enemy; }
+    int &CurrentLevel() { return currentLevel; }
+    int &CurrentEnemies() { return currentEnemies; }
 
     void addBoss();
     void addBoss(double, double);

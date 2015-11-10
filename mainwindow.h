@@ -28,10 +28,6 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    int currentLevel = 1; // don't know if this is the right place to put it
-    int num_enemy = 5;
-    int currentEnemies = 0;
-
     QTimer *timer = new QTimer(this);
     //creating these now so they don't lag up the game to death
     QSound *pewSound = new QSound(":/images/pew.wav");
