@@ -6,10 +6,19 @@
 #include <QTimer>
 #include <QSound>
 #include <QString>
+#include <QKeyEvent>
+#include <QDebug>
+#include <QPixmap>
+#include <QTransform>
+#include <QMatrix>
+#include <QMessageBox>
+#include <QSound>
 
 #include "player.h"
 #include "alien.h"
+#include "boss.h"
 #include "game.h"
+#include "enemyspawn.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,10 +27,6 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
-    int currentLevel = 1; // don't know if this is the right place to put it
-    int num_enemy = 5;
-    int currentEnemies = 0;
 
     QTimer *timer = new QTimer(this);
     //creating these now so they don't lag up the game to death
@@ -119,6 +124,26 @@ public:
     }
 
     void alienGen(QPixmap pixmap);
+
+};
+
+class BossLabel : public QLabel
+{
+    Q_OBJECT
+
+    Boss *myBoss;
+
+public:
+    explicit BossLabel(QWidget *parent): QLabel(parent) { }
+    Boss *getBoss() const { return myBoss; }
+    void setBoss(Boss *boss) { myBoss = boss; }
+
+    ~BossLabel()
+    {
+        delete myBoss;
+    }
+
+    void bossGen(QPixmap pixmap);
 
 };
 
