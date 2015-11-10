@@ -162,10 +162,12 @@ void Game::load()
                 int speed = stoi(data[3]);
                 int angle = stoi(data[4]);
                 QString name = QString::fromStdString(data[5]);
+                QString pixmapName = QString::fromStdString(data[6]);
                 players.push_back(new Player(x, y, name));
                 players[players.size() - 1]->setRot(rotation);
                 players[players.size() - 1]->setSpeed(speed);
                 players[players.size() - 1]->setAngle(angle);
+                players[players.size() - 1]->setPixmapName(pixmapName);
                 break;
             }
             case 'A':

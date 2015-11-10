@@ -22,6 +22,7 @@ private:
     int speed; // the current speed the ship is traveling at (may be rewritten)
     int angle; // the angle the ship is drifting at
     QString peerName; // The name of the network client controlling this one
+    QString pixmapName; // The chosen pixmap for the ship. Used to transfer across networks
 public:
     Player(int startX, int startY, QString name): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0) { }
 
@@ -32,10 +33,12 @@ public:
     int getAngle() { return angle; }
     int getSpeed() { return speed; }
     QString getPeerName() { return peerName; }
+    QString getPixmapName() { return pixmapName; }
 
     void setRot(int rot) { rotation = rot; }
     void setAngle(int ang) { angle = ang; }
     void setSpeed(int spd) { speed = spd; }
+    void setPixmapName(QString name) { pixmapName = name; }
 
     std::string getSave();
 
