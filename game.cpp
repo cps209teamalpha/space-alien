@@ -44,7 +44,7 @@ void Game::addAlien(int rotation)
     }
 
     aliens.push_back(new Alien(startX, startY, nextAlien, rotation));
-
+    currentEnemies++;
     nextAlien++;
 }
 

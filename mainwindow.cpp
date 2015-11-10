@@ -278,8 +278,41 @@ void MainWindow::advanceLevel() {
 
 
     ++Game::instance()->CurrentLevel();
+    int lvl = Game::instance()->CurrentLevel();
 
-    makeEnemies(Game::instance()->Num_enemy() * Game::instance()->CurrentLevel());
+    // consider moving the following 5 lines into a function?
+    // does the same thing as init
+
+    if(Game::instance()->CurrentLevel() == 5) {
+        Game::instance()->addBoss(50, 50);
+
+        vector<Boss*> bosses = Game::instance()->getBosses();
+
+        for (size_t i = 0; i < bosses.size(); i++) {
+            BossLabel *lblBoss = new BossLabel(ui->centralWidget);
+            lblBoss->setBoss(bosses.at(i));
+            QPixmap pixmap(":/images/mrj.png");
+            lblBoss->bossGen(pixmap);
+        }
+    }
+    else {
+        makeEnemies(Game::instance()->Num_enemy() * Game::instance()->CurrentLevel());
+        Game::instance()->addAlien(0);
+        Game::instance()->addAlien(90);
+        Game::instance()->addAlien(180);
+        Game::instance()->addAlien(270);
+
+        vector<Alien*> aliens = Game::instance()->getAliens();
+
+        for (size_t i = 0; i < aliens.size(); i++)
+        {
+            AlienLabel *lblAlien = new AlienLabel(ui->centralWidget);
+            lblAlien->setAlien(aliens[i]);
+            QPixmap pixmap(":/images/alien1.png");
+            lblAlien->alienGen(pixmap);
+        }
+    }
+
 }
 
 void MainWindow::hideMessage()
@@ -450,6 +483,10 @@ void MainWindow::timerHit()
                        alienTest->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
                        lblShot->deleteLater();
+                       --Game::instance()->CurrentEnemies();
+                       if(noEnemiesLeft()) {
+                           advanceLevel();
+                       }
                    }
                 }
             }
