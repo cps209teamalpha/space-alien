@@ -3,7 +3,11 @@
 
 #include <QLabel>
 #include <QString>
+#include <QDebug>
+#include <QtMath>
+
 #include <string>
+#include <math.h>
 
 // The player class. In mp mode, there
 // will be multiple player objects, so

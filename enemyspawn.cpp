@@ -1,9 +1,3 @@
-#include <QString>
-#include <QLabel>
-#include <QDebug>
-#include <string>
-#include <random>
-
 #include "enemyspawn.h"
 
 using namespace std;

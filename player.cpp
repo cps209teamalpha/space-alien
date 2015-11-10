@@ -1,10 +1,4 @@
-﻿#include <math.h>
-
-#include "player.h"
-
-#include <QDebug>
-#include <QtMath>
-#include <string>
+﻿#include "player.h"
 
 using namespace std;
 
