@@ -6,6 +6,7 @@
 
 #include "player.h"
 #include "alien.h"
+#include "boss.h"
 
 using namespace std;
 
@@ -48,6 +49,10 @@ public:
 class Game : SavableObject
 {
 private:
+    int currentLevel = 1; // don't know if this is the right place to put it
+    int num_enemy = 5;
+    int currentEnemies = 0;
+
     Highscores *highscores;
     // All the players in the game.
     // Normally one; if network support
@@ -55,6 +60,8 @@ private:
     vector<Player*> players;
 
     vector<Alien*> aliens;
+
+    vector<Boss*> bosses;
 
     vector<Shot*> shots;
 
@@ -72,6 +79,13 @@ public:
     void newGame();
     // Updates player & enemies, for use with a timer
     void updateField();
+
+    int &Num_enemy() { return num_enemy; }
+    int &CurrentLevel() { return currentLevel; }
+    int &CurrentEnemies() { return currentEnemies; }
+
+    void addBoss();
+    void addBoss(double, double);
 
     void addAlien(int rotation);
     void addPlayer(int x, int y) { players.push_back(new Player(x, y)); }
@@ -104,6 +118,8 @@ public:
     Player *getPlayer() { return players[0]; }
 
     vector<Alien*> getAliens() { return aliens; }
+
+    vector<Boss*> getBosses() { return bosses; }
 
     // Methods to save/load game.
     // Talk to Mr. J about necessity of these
