@@ -203,7 +203,6 @@ void ShotLabel::shotGen()
     setPixmap(pixmap);
     setScaledContents(true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-
     show();
 }
 
@@ -267,8 +266,31 @@ bool MainWindow::noEnemiesLeft() {
 
 // lazy level implementation
 void MainWindow::advanceLevel() {
+    //Plays a sound before level advances
+    levelUp->play();
+
+    //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
+        congratsLabel = new QLabel(this);
+    congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
+        congratsLabel->adjustSize();
+        congratsLabel->move(230, 270);
+    congratsLabel->show();
+
+    connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
+    congratsLabelTimer->start(3000);
+
+
     currentLevel += 1;
+
     makeEnemies(num_enemy * currentLevel);
+}
+
+void MainWindow::hideMessage()
+{
+    //slot to hide the msg and stop the timer.
+    congratsLabel->hide();
+    congratsLabelTimer->stop();
+
 }
 
 //Performs different operations on each timer event
@@ -302,7 +324,9 @@ void MainWindow::timerHit()
             }
             if (spacebarKeyPressed)
             {
-                Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot());
+                //setting the shot as false (player shot)
+                Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+
 
                 ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -334,6 +358,24 @@ void MainWindow::timerHit()
                        QApplication::quit();
                    }
                 }
+                //Collision for the player when hit by alien lasers. Only dies from alien shots.
+                 ShotLabel *lblShot = dynamic_cast<ShotLabel *>(objList[i]);
+
+                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true)
+                 {
+                     if (lblPlayer->x() < (lblShot->x() + (lblShot->width() / 2)) &&
+                             (lblPlayer->x() + lblPlayer->width()) > lblShot->x() &&
+                             lblPlayer->y() < (lblShot->y() + (lblShot->height() / 2)) &&
+                             ((lblPlayer->height() / 2) + lblPlayer->y()) > lblShot->y())
+                     {
+                         if (ui->cbSound->isChecked())
+                         {
+                             riperinoPlayerino->play();
+                         }
+                         QMessageBox::information(this, "", "You have been DESTROYED!");
+                         QApplication::quit();
+                     }
+                 }
             }
 
         }
