@@ -280,7 +280,7 @@ void MainWindow::advanceLevel() {
     ++Game::instance()->CurrentLevel();
     int lvl = Game::instance()->CurrentLevel();
 
-    // consider moving the following 5 lines into a function?
+    // consider moving the following lines into a function?
     // does the same thing as init
 
     if(Game::instance()->CurrentLevel() == 5) {
