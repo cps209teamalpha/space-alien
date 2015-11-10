@@ -27,7 +27,7 @@ class Shot
 {
 private:
     int id;
-
+    bool isAlienShot; //used to differentiate between player lasers and alien lasers
     int x,y;
 
     int angle;
@@ -37,7 +37,9 @@ public:
     int getX() { return x; }
     int getY() { return y; }
     int getID() { return id; }
-
+    //obvious mutator and accessor methods
+    void setIsAlienShot(bool set) { isAlienShot = set; }
+    bool getIsAlienShot() { return isAlienShot; }
     string getSave();
 
     void move();
@@ -82,9 +84,11 @@ public:
 
     int getShotTimer() { return shotTimer; }
 
-    void addShot(int origX, int origY, int angle)
+    void addShot(int origX, int origY, int angle, bool isShotAlien)
     {
         shots.push_back(new Shot(origX, origY, angle, nextShot));
+        Shot *foo = shots.back();
+        foo->setIsAlienShot(isShotAlien);
         nextShot++;
     }
 

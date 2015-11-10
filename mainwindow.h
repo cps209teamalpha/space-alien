@@ -28,6 +28,9 @@ class MainWindow : public QMainWindow
     QSound *pewSound = new QSound(":/images/pew.wav");
     QSound *riperinoPlayerino = new QSound(":/images/ripplayer.wav");
     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
+     QSound *levelUp = new QSound(":/images/levelAccomplished.wav");
+     QTimer *congratsLabelTimer = new QTimer(this);
+     QLabel *congratsLabel;
 
     bool upKeyPressed = false;
     bool downKeyPressed = false;
@@ -52,7 +55,7 @@ public:
 
 private slots:
     void timerHit();
-
+    void hideMessage();
     void on_btnPlay_clicked();
 
 private:
