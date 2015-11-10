@@ -1,8 +1,3 @@
-#include <QString>
-
-#include <vector>
-#include <fstream>
-#include <string>
 #include "game.h"
 
 #ifndef M_PI

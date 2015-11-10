@@ -2,9 +2,8 @@
 #define GAME_H
 
 #include <QString>
-
 #include <vector>
-#include <string>
+#include <fstream>
 
 #include "player.h"
 #include "alien.h"

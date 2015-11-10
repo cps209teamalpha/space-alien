@@ -1,8 +1,6 @@
 #include "alien.h"
 #include "game.h"
 
-#include <string>
-
 using namespace std;
 
 string Alien::getSave()

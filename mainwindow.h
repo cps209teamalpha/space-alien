@@ -14,7 +14,6 @@
 #include <QTransform>
 #include <QMatrix>
 #include <QMessageBox>
-#include <QSound>
 
 #include "player.h"
 #include "alien.h"
