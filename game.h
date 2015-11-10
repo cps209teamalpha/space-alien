@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <QString>
+
 #include <vector>
 #include <string>
 
@@ -16,6 +18,9 @@ public:
     virtual void load() = 0;
     virtual void save() = 0;
 };
+
+vector<string> splitString(string input, char delim);
+vector<QString> splitQString(QString input, char delim);
 
 // The game object contains all the data about player position, enemy position,
 // score, etc.
@@ -88,7 +93,9 @@ public:
     void addBoss(double, double);
 
     void addAlien(int rotation);
-    void addPlayer(int x, int y) { players.push_back(new Player(x, y)); }
+    void addNewAlien(int x, int y, int id, int rotation) { aliens.push_back(new Alien(x, y, id, rotation)); }
+    void addOldShot(int x, int y, int angle, int id) { shots.push_back(new Shot(x, y, angle, id)); }
+    void addPlayer(int x, int y, QString name) { players.push_back(new Player(x, y, name)); }
 
     void addUntrackedShot() { untrackedShots++; }
 
@@ -108,14 +115,17 @@ public:
 
     void deleteShot(int shotID);
     void deleteAlien(int alienID);
+    void deletePlayer(QString playerName);
 
     Shot *getLastShot() { return shots[shots.size() - 1]; }
+
+    Shot *getShot(int id);
+    Alien *getAlien(int id);
 
     vector<Player*> getPlayers() { return players; }
     vector<Shot*> getShots() { return shots; }
 
-    // For debug purposes only:
-    Player *getPlayer() { return players[0]; }
+    Player *getPlayer(QString name);
 
     vector<Alien*> getAliens() { return aliens; }
 
