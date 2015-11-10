@@ -21,6 +21,8 @@ string Player::getSave()
     result += to_string(speed);
     result += ",";
     result += to_string(angle);
+    result += ",";
+    result += peerName.toStdString();
     result += "\n";
     return result;
 }

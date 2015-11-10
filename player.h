@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include <QLabel>
+#include <QString>
 #include <string>
 
 // The player class. In mp mode, there
@@ -16,8 +17,9 @@ private:
     int x, y; // x, y = current ship loc - int, to get proper movement. Should be rounded to ints for graphics purposes
     int speed; // the current speed the ship is traveling at (may be rewritten)
     int angle; // the angle the ship is drifting at
+    QString peerName; // The name of the network client controlling this one
 public:
-    Player(int startX, int startY): x(startX), y(startY), rotation(0), speed(0), angle(0) { }
+    Player(int startX, int startY, QString name): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0) { }
 
     // Accessor methods (mostly for debugging)
     int getX() { return x; }
@@ -25,6 +27,7 @@ public:
     int getRot() { return rotation; }
     int getAngle() { return angle; }
     int getSpeed() { return speed; }
+    QString getPeerName() { return peerName; }
 
     void setRot(int rot) { rotation = rot; }
     void setAngle(int ang) { angle = ang; }

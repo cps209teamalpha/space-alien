@@ -6,6 +6,8 @@
 #include <QTimer>
 #include <QSound>
 #include <QString>
+#include <QTcpServer>
+#include <QTcpSocket>
 
 #include "player.h"
 #include "alien.h"
@@ -28,12 +30,16 @@ class MainWindow : public QMainWindow
     QSound *pewSound = new QSound(":/images/pew.wav");
     QSound *riperinoPlayerino = new QSound(":/images/ripplayer.wav");
     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
+    QTcpServer* server;
+    QTcpSocket* socket;
 
     bool upKeyPressed = false;
     bool downKeyPressed = false;
     bool rightKeyPressed = false;
     bool leftKeyPressed = false;
     bool spacebarKeyPressed = false;
+
+    bool synching = false;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -50,10 +56,17 @@ public:
     void hideGUI();
     QString shipSelect();
 
+    void sendGameData();
+
 private slots:
     void timerHit();
 
     void on_btnPlay_clicked();
+
+    void clientConnected();
+    void dataReceived();
+    void clientDisconnected();
+    void serverDisconnected();
 
 private:
     Ui::MainWindow *ui;

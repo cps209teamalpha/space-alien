@@ -83,7 +83,7 @@ selection-color: rgb(0, 255, 0);
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>430</y>
+      <y>411</y>
       <width>70</width>
       <height>17</height>
      </rect>
@@ -245,6 +245,125 @@ selection-color: rgb(0, 255, 0);
      <string/>
     </property>
    </widget>
+   <widget class="QWidget" name="networkSelect" native="true">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>441</y>
+      <width>141</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <widget class="QRadioButton" name="rbSingleplayer">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>131</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Standalone Game</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbServer">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>22</y>
+       <width>102</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Game Server</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbClient">
+     <property name="geometry">
+      <rect>
+       <x>22</x>
+       <y>46</y>
+       <width>102</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>Game Client</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLineEdit" name="lnHostname">
+    <property name="geometry">
+     <rect>
+      <x>384</x>
+      <y>519</y>
+      <width>113</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>localhost</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblHostname">
+    <property name="geometry">
+     <rect>
+      <x>296</x>
+      <y>521</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Connect to:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblPeerName">
+    <property name="geometry">
+     <rect>
+      <x>297</x>
+      <y>548</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Connect as:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lnPeerName">
+    <property name="geometry">
+     <rect>
+      <x>385</x>
+      <y>546</y>
+      <width>113</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>networkPlayer</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -252,7 +371,7 @@ selection-color: rgb(0, 255, 0);
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

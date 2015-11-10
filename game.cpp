@@ -1,3 +1,5 @@
+#include <QString>
+
 #include <vector>
 #include <fstream>
 #include <string>
@@ -20,6 +22,17 @@ Game::Game()
     nextAlien = 0;
     shotTimer = 50;
     untrackedShots = 0;
+}
+
+Player *Game::getPlayer(QString name)
+{
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        if (players[i]->getPeerName() == name)
+        {
+            return players[i];
+        }
+    }
 }
 
 void Game::addAlien(int rotation)
@@ -99,6 +112,26 @@ vector<string> splitString(string input, char delim)
     return result;
 }
 
+vector<QString> splitQString(QString input, char delim)
+{
+    vector<QString> result;
+    QString line = "";
+    for (int i = 0; i < input.size(); i++)
+    {
+        if (input[i] == delim)
+        {
+            result.push_back(line);
+            line = "";
+        }
+        else
+        {
+            line += input[i];
+        }
+    }
+    result.push_back(line);
+    return result;
+}
+
 // Methods to save/load game.
 // Reads file and instantiates member variables with the info
 void Game::load()
@@ -126,7 +159,8 @@ void Game::load()
                 int rotation = stoi(data[2]);
                 int speed = stoi(data[3]);
                 int angle = stoi(data[4]);
-                players.push_back(new Player(x, y));
+                QString name = QString::fromStdString(data[5]);
+                players.push_back(new Player(x, y, name));
                 players[players.size() - 1]->setRot(rotation);
                 players[players.size() - 1]->setSpeed(speed);
                 players[players.size() - 1]->setAngle(angle);
@@ -188,6 +222,30 @@ void Game::save()
     myfile.close();
 }
 
+Shot *Game::getShot(int id)
+{
+    for (size_t i = 0; i < shots.size(); i++)
+    {
+        if (shots[i]->getID() == id)
+        {
+            return shots[i];
+        }
+    }
+    return nullptr;
+}
+
+Alien *Game::getAlien(int id)
+{
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        if (aliens[i]->getID() == id)
+        {
+            return aliens[i];
+        }
+    }
+    return nullptr;
+}
+
 void Game::deleteShot(int shotID)
 {
     int index = -1;
@@ -219,6 +277,23 @@ void Game::deleteAlien(int alienID)
     {
         delete aliens[index];
         aliens.erase(aliens.begin() + index);
+    }
+}
+
+void Game::deletePlayer(QString playerName)
+{
+    int index = -1;
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        if (players[i]->getPeerName() == playerName)
+        {
+            index = i;
+        }
+    }
+    if (index >= 0)
+    {
+        delete players[index];
+        players.erase(players.begin() + index);
     }
 }
 
