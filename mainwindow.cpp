@@ -280,7 +280,7 @@ void MainWindow::advanceLevel() {
     congratsLabelTimer->start(3000);
 
 
-    currentLevel += 1;
+    ++currentLevel;
 
     makeEnemies(num_enemy * currentLevel);
 }
