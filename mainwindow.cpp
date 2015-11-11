@@ -129,7 +129,28 @@ void MainWindow::dataReceived()
                     int y = stoi(data[1]);
                     int angle = stoi(data[2]);
                     int id = stoi(data[3]);
-                    Game::instance()->addOldShot(x, y, angle, id);
+                    bool isAlienShot;
+                    if (data[4] == "1")
+                    {
+                        isAlienShot = true;
+                    }
+                    else
+                    {
+                        isAlienShot = false;
+                    }
+                    Game::instance()->addOldShot(x, y, angle, id, isAlienShot);
+                    break;
+                }
+                case 'E':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int dX = stoi(data[2]);
+                    int dY = stoi(data[3]);
+                    int id = stoi(data[4]);
+                    Game::instance()->addOldEnemy(x, y, dX, dY, id);
                     break;
                 }
                 }
@@ -227,8 +248,11 @@ void MainWindow::resetGUI()
                     }
                     else
                     {
-                        // Should delete Enemies here, but they aren't
-                        // yet capable of being reloaded.
+                        EnemyLabel *lblEnemy = dynamic_cast<EnemyLabel *>(lbl);
+                        if (lblEnemy != nullptr)
+                        {
+                            lblEnemy->deleteLater();
+                        }
                     }
                 }
             }
@@ -258,6 +282,13 @@ void MainWindow::resetGUI()
         ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
         lblShot->setShot(shots[i]);
         lblShot->shotGen();
+    }
+    vector<Enemy*> enemies = Game::instance()->getEnemies();
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        EnemyLabel *lblEnemy = new EnemyLabel(ui->centralWidget);
+        lblEnemy->setEnemy(enemies[i]);
+        lblEnemy->enemyGen();
     }
 }
 
@@ -441,22 +472,22 @@ void PlayerLabel::rotate(int angle)
 
 // Generate X number of enemies on the screen
 void MainWindow::makeEnemies(int num_enemy) {
-    for (int i = 0; i < num_enemy; ++i)
+    for (int i = 0; i <= num_enemy; ++i)
     {
         auto label_left = random_int(0, this->geometry().width() - 32);
         auto label_top = random_int(ui->btnPlay->geometry().bottom(),
                        this->geometry().height() - 32);
 
-        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
-        QPixmap evil(":/images/asteroid.png");
-        alien->enemyGen(evil, alien, label_left, label_top);
-        Game::instance()->CurrentEnemies() += 1;
+        Game::instance()->addEnemy(label_left, label_top, random_int(-1, 1), random_int(-1, 1));
+        EnemyLabel *lblEnemy = new EnemyLabel(ui->centralWidget);
+        lblEnemy->setEnemy(Game::instance()->getLastEnemy());
+        lblEnemy->enemyGen();
     }
 }
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (Game::instance()->CurrentEnemies() == 0) return true;
+    if (Game::instance()->getCurrentEnemies() == 0) return true;
     else                     return false;
 }
 
@@ -677,7 +708,7 @@ void MainWindow::timerHit()
             //2D unit collision algorithm from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
             for (int i = 0; i < objList.size(); i++)
             {
-                Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+                EnemyLabel *test = dynamic_cast<EnemyLabel *>(objList[i]);
                 if (test != nullptr)
                 {
                    if (lblPlayer->x() < (test->x() + (test->width() / 2)) &&
@@ -749,7 +780,7 @@ void MainWindow::timerHit()
             }
             for (int i = 0; i < objList.size(); i++)
             {
-                Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+                EnemyLabel *test = dynamic_cast<EnemyLabel *>(objList[i]);
                 if (test != nullptr)
                 {
                    if (lblShot->x() < (test->x() + (test->width() / 2)) &&
@@ -762,45 +793,47 @@ void MainWindow::timerHit()
                        {
                            ripAsteroid->play();
                        }
+                       Game::instance()->deleteEnemy(test->getEnemy()->getID());
                        test->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
                        lblShot->deleteLater();
-                       --Game::instance()->CurrentEnemies();
                        if(noEnemiesLeft()) {
                            advanceLevel();
                        }
                    }
                 }
+                if (!lblShot->getShot()->getIsAlienShot())
+                {
                 AlienLabel *alienTest = dynamic_cast<AlienLabel *>(objList[i]);
                 if (alienTest != nullptr)
                 {
-                   if (lblShot->x() < (alienTest->x() + (alienTest->width() / 2)) &&
+                        if (lblShot->x() < (alienTest->x() + (alienTest->width() / 2)) &&
                            (lblShot->x() + lblShot->width()) > alienTest->x() &&
-                           lblShot->y() < (alienTest->y() + (alienTest->height() / 2)) &&
+                           (lblShot->y() < (alienTest->y()) + (alienTest->height() / 2)) &&
                            ((lblShot->height() / 2) + lblShot->y()) > alienTest->y())
 
-                   {
-                       if (ui->cbSound->isChecked())
-                       {
-                           ripAsteroid->play();
-                       }
-                       Game::instance()->deleteAlien(alienTest->getAlien()->getID());
-                       alienTest->deleteLater();
-                       Game::instance()->deleteShot(lblShot->getShot()->getID());
-                       lblShot->deleteLater();
-                       --Game::instance()->CurrentEnemies();
-                       if(noEnemiesLeft()) {
-                           advanceLevel();
-                       }
-                   }
+                        {
+                            if (ui->cbSound->isChecked())
+                            {
+                                ripAsteroid->play();
+                            }
+                            Game::instance()->deleteAlien(alienTest->getAlien()->getID());
+                            alienTest->deleteLater();
+                            Game::instance()->deleteShot(lblShot->getShot()->getID());
+                            lblShot->deleteLater();
+                            if(noEnemiesLeft()) {
+                                advanceLevel();
+                            }
+                        }
+                    }
                 }
             }
         }
         //Updates an Enemy's position
-        Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
+        EnemyLabel *lblEnemy = dynamic_cast<EnemyLabel *>(lbl);
         if (lblEnemy != nullptr)
         {
-            lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
+            lblEnemy->move(lblEnemy->getEnemy()->getX(), lblEnemy->getEnemy()->getY());
         }
     }
 }
@@ -876,6 +909,7 @@ void MainWindow::sendGameData(QTcpSocket *sock)
     vector<Player*> players = Game::instance()->getPlayers();
     vector<Shot*> shots = Game::instance()->getShots();
     vector<Alien*> aliens = Game::instance()->getAliens();
+    vector<Enemy*> enemies = Game::instance()->getEnemies();
     for (size_t i = 0; i < players.size(); i++)
     {
         msg = QString::fromStdString(players[i]->getSave());
@@ -889,6 +923,11 @@ void MainWindow::sendGameData(QTcpSocket *sock)
     for (size_t i = 0; i < aliens.size(); i++)
     {
         msg = QString::fromStdString(aliens[i]->getSave());
+        sock->write(msg.toLocal8Bit());
+    }
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        msg = QString::fromStdString(enemies[i]->getSave());
         sock->write(msg.toLocal8Bit());
     }
     msg = "SYNCHEND\n";
@@ -979,7 +1018,6 @@ void MainWindow::on_btnPlay_clicked()
         QPixmap pixmap(":/images/mrj.png");
         lblBoss->bossGen(pixmap);
     }
-
 
     vector<Alien*> aliens = Game::instance()->getAliens();
 

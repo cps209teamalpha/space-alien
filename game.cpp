@@ -13,6 +13,7 @@ Game::Game()
     highscores = new Highscores();
     nextShot = 0;
     nextAlien = 0;
+    nextEnemy = 0;
     shotTimer = 50;
     untrackedShots = 0;
 }
@@ -52,7 +53,6 @@ void Game::addAlien(int rotation)
     }
 
     aliens.push_back(new Alien(startX, startY, nextAlien, rotation));
-    currentEnemies++;
     nextAlien++;
 }
 
@@ -71,8 +71,11 @@ void Game::newGame()
     players.clear();
     aliens.clear();
     shots.clear();
+    enemies.clear();
+    bosses.clear();
     nextShot = 0;
     nextAlien = 0;
+    nextEnemy = 0;
     untrackedShots = 0;
 }
 
@@ -91,6 +94,10 @@ void Game::updateField()
     for (size_t i = 0; i < shots.size(); i++)
     {
         shots[i]->move();
+    }
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        enemies[i]->move();
     }
 }
 
@@ -147,6 +154,10 @@ void Game::load()
         getline(myfile, line);
         nextShot = stoi(line);
         getline(myfile, line);
+        nextAlien = stoi(line);
+        getline(myfile, line);
+        nextEnemy = stoi(line);
+        getline(myfile, line);
         shotTimer = stoi(line);
         while (getline(myfile, line))
         {
@@ -191,7 +202,28 @@ void Game::load()
                 int y = stoi(data[1]);
                 int angle = stoi(data[2]);
                 int id = stoi(data[3]);
-                shots.push_back(new Shot(x, y, angle, id));
+                bool isAlienShot;
+                if (data[4] == "1")
+                {
+                    isAlienShot = true;
+                }
+                else
+                {
+                    isAlienShot = false;
+                }
+                shots.push_back(new Shot(x, y, angle, id, isAlienShot));
+                break;
+            }
+            case 'E':
+            {
+                line = line.substr(1, line.size() - 1);
+                vector<string> data = splitString(line, ',');
+                int x = stoi(data[0]);
+                int y = stoi(data[1]);
+                int dX = stoi(data[2]);
+                int dY = stoi(data[3]);
+                int id = stoi(data[4]);
+                enemies.push_back(new Enemy(x, y, dX, dY, id));
                 break;
             }
             }
@@ -210,6 +242,8 @@ void Game::save()
     ofstream myfile;
     myfile.open("save.txt");
     myfile << to_string(nextShot) << "\n";
+    myfile << to_string(nextAlien) << "\n";
+    myfile << to_string(nextEnemy) << "\n";
     myfile << to_string(shotTimer) << "\n";
     for (size_t i = 0; i < players.size(); i++)
     {
@@ -222,6 +256,10 @@ void Game::save()
     for (size_t i = 0; i < shots.size(); i++)
     {
         myfile << shots[i]->getSave();
+    }
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        myfile << enemies[i]->getSave();
     }
     myfile.close();
 }
@@ -245,6 +283,18 @@ Alien *Game::getAlien(int id)
         if (aliens[i]->getID() == id)
         {
             return aliens[i];
+        }
+    }
+    return nullptr;
+}
+
+Enemy *Game::getEnemy(int id)
+{
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        if (enemies[i]->getID() == id)
+        {
+            return enemies[i];
         }
     }
     return nullptr;
@@ -284,6 +334,23 @@ void Game::deleteAlien(int alienID)
     }
 }
 
+void Game::deleteEnemy(int enemyID)
+{
+    int index = -1;
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        if (enemies[i]->getID() == enemyID)
+        {
+            index = i;
+        }
+    }
+    if (index >= 0)
+    {
+        delete enemies[index];
+        enemies.erase(enemies.begin() + index);
+    }
+}
+
 void Game::deletePlayer(QString playerName)
 {
     int index = -1;
@@ -317,6 +384,10 @@ Game::~Game()
     {
         delete shots[i];
     }
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        delete enemies[i];
+    }
 }
 
 // Singleton implementation
@@ -340,6 +411,15 @@ string Shot::getSave()
     result += to_string(angle);
     result += ",";
     result += to_string(id);
+    result += ",";
+    if (isAlienShot)
+    {
+        result += "1";
+    }
+    else
+    {
+        result += "0";
+    }
     result += "\n";
     return result;
 }
