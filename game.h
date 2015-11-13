@@ -1,12 +1,14 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <QString>
 #include <vector>
-#include <string>
+#include <fstream>
 
 #include "player.h"
 #include "alien.h"
 #include "boss.h"
+#include "enemyspawn.h"
 
 using namespace std;
 
@@ -16,6 +18,9 @@ public:
     virtual void load() = 0;
     virtual void save() = 0;
 };
+
+vector<string> splitString(string input, char delim);
+vector<QString> splitQString(QString input, char delim);
 
 // The game object contains all the data about player position, enemy position,
 // score, etc.
@@ -33,7 +38,7 @@ private:
 
     int angle;
 public:
-    Shot(int startX, int startY, int startAngle, int ID): x(startX), y(startY), angle(startAngle), id(ID) { }
+    Shot(int startX, int startY, int startAngle, int ID, bool alienShot): x(startX), y(startY), angle(startAngle), id(ID), isAlienShot(alienShot) { }
 
     int getX() { return x; }
     int getY() { return y; }
@@ -50,8 +55,7 @@ class Game : SavableObject
 {
 private:
     int currentLevel = 1; // don't know if this is the right place to put it
-    int num_enemy = 5;
-    int currentEnemies = 0;
+    int numEnemy = 5;
 
     Highscores *highscores;
     // All the players in the game.
@@ -65,8 +69,11 @@ private:
 
     vector<Shot*> shots;
 
+    vector<Enemy*> enemies;
+
     int nextShot;
-    int nextAlien; // Generates unique ids for the shots and aliens
+    int nextEnemy;
+    int nextAlien; // Generates unique ids for the shots, enemies, and aliens
 
     int shotTimer;
 
@@ -80,15 +87,18 @@ public:
     // Updates player & enemies, for use with a timer
     void updateField();
 
-    int &Num_enemy() { return num_enemy; }
+    int &Num_enemy() { return numEnemy; }
     int &CurrentLevel() { return currentLevel; }
-    int &CurrentEnemies() { return currentEnemies; }
+    int getCurrentEnemies() { return (int)enemies.size(); }
 
     void addBoss();
     void addBoss(double, double);
 
     void addAlien(int rotation);
-    void addPlayer(int x, int y) { players.push_back(new Player(x, y)); }
+    void addNewAlien(int x, int y, int id, int rotation) { aliens.push_back(new Alien(x, y, id, rotation)); }
+    void addOldShot(int x, int y, int angle, int id, bool alienShot) { shots.push_back(new Shot(x, y, angle, id, alienShot)); }
+    void addOldEnemy(int x, int y, int deltaX, int deltaY, int id) { enemies.push_back(new Enemy(x, y, deltaX, deltaY, id)); }
+    void addPlayer(int x, int y, QString name) { players.push_back(new Player(x, y, name)); }
 
     void addUntrackedShot() { untrackedShots++; }
 
@@ -100,29 +110,40 @@ public:
 
     void addShot(int origX, int origY, int angle, bool isShotAlien)
     {
-        shots.push_back(new Shot(origX, origY, angle, nextShot));
-        Shot *foo = shots.back();
-        foo->setIsAlienShot(isShotAlien);
+        shots.push_back(new Shot(origX, origY, angle, nextShot, isShotAlien));
         nextShot++;
     }
 
+    void addEnemy(int origX, int origY, int deltaX, int deltaY)
+    {
+        enemies.push_back(new Enemy(origX, origY, deltaX, deltaY, nextEnemy));
+        nextEnemy++;
+    }
+
     void deleteShot(int shotID);
+    void deleteEnemy(int enemyID);
     void deleteAlien(int alienID);
+    void deletePlayer(QString playerName);
 
     Shot *getLastShot() { return shots[shots.size() - 1]; }
+    Enemy *getLastEnemy() { return enemies[enemies.size() - 1]; }
+
+    Shot *getShot(int id);
+    Alien *getAlien(int id);
+    Enemy *getEnemy(int id);
 
     vector<Player*> getPlayers() { return players; }
     vector<Shot*> getShots() { return shots; }
 
-    // For debug purposes only:
-    Player *getPlayer() { return players[0]; }
+    Player *getPlayer(QString name);
 
     vector<Alien*> getAliens() { return aliens; }
+
+    vector<Enemy*> getEnemies() { return enemies; }
 
     vector<Boss*> getBosses() { return bosses; }
 
     // Methods to save/load game.
-    // Talk to Mr. J about necessity of these
     // Reads file and instantiates member variables with the info
     void load();
     // Writes game to file

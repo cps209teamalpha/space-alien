@@ -1,46 +1,56 @@
-#include <QString>
-#include <QLabel>
-#include <QDebug>
-#include <string>
-#include <random>
-
 #include "enemyspawn.h"
 
 using namespace std;
 
-//Generates a new enemy
-void Enemy::enemyGen(QPixmap evil, Enemy *alien, int label_left, int label_top)
+void EnemyLabel::enemyGen()
 {
-    alien->setPixmap(evil);
-    alien->setGeometry(QRect(label_left, label_top, 32, 32));
-    alien->setScaledContents(true);
-    alien->setAttribute(Qt::WA_TranslucentBackground, true);
-    alien->show();
+    QPixmap pixmap(":/images/asteroid.png");
+
+    setGeometry(getEnemy()->getX(), getEnemy()->getY(), 32, 32);
+    setPixmap(pixmap);
+    setScaledContents(true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    show();
 }
 
 //Updates an Enemy's current position
-void Enemy::updateEnemy(Enemy *lblEnemy)
+void Enemy::move()
 {
-    int deltaX = lblEnemy->getDeltaX();
-    int deltaY = lblEnemy->getDeltaY();
-    lblEnemy->move(lblEnemy->x() + deltaX, lblEnemy->y() + deltaY);
+    x += dX;
+    y += dY;
 
     //Bounds Checking
-    if (lblEnemy->x() == 800)
+    if (x >= 800)
     {
-        lblEnemy->move(lblEnemy->x() - 800, lblEnemy->y() + 0);
+        x -= 800;
     }
-    else if (lblEnemy->x() == 0)
+    else if (x <= 0)
     {
-        lblEnemy->move(lblEnemy->x() + 800, lblEnemy->y() + 0);
+        x += 800;
     }
 
-    if (lblEnemy->y() == 573)
+    if (y >= 573)
     {
-        lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() - 573);
+        y -= 573;
     }
-    else if (lblEnemy->y() == 0)
+    else if (y <= 0)
     {
-        lblEnemy->move(lblEnemy->x() + 0, lblEnemy->y() + 573);
+        y += 573;
     }
+}
+
+string Enemy::getSave()
+{
+    string result = "E";
+    result += to_string(x);
+    result += ",";
+    result += to_string(y);
+    result += ",";
+    result += to_string(dX);
+    result += ",";
+    result += to_string(dY);
+    result += ",";
+    result += to_string(id);
+    result += "\n";
+    return result;
 }

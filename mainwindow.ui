@@ -17,10 +17,11 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-image: url(:/images/space.jpg);</string>
+   <string notr="true">background-image: url(:/images/space.jpg);
+color: rgb(255, 255, 255);</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QLabel" name="lblMove">
+   <widget class="QLabel" name="lblSpaceship1">
     <property name="geometry">
      <rect>
       <x>220</x>
@@ -83,8 +84,8 @@ selection-color: rgb(0, 255, 0);
     <property name="geometry">
      <rect>
       <x>370</x>
-      <y>430</y>
-      <width>70</width>
+      <y>411</y>
+      <width>16</width>
       <height>17</height>
      </rect>
     </property>
@@ -92,10 +93,10 @@ selection-color: rgb(0, 255, 0);
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">color: rgb(255, 255, 255);</string>
+     <string notr="true">color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
-     <string>Sounds</string>
+     <string/>
     </property>
     <property name="checked">
      <bool>true</bool>
@@ -186,6 +187,9 @@ selection-color: rgb(0, 255, 0);
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -202,6 +206,9 @@ selection-color: rgb(0, 255, 0);
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -214,6 +221,9 @@ selection-color: rgb(0, 255, 0);
       <width>16</width>
       <height>22</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
     </property>
     <property name="text">
      <string/>
@@ -228,6 +238,9 @@ selection-color: rgb(0, 255, 0);
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
@@ -241,10 +254,215 @@ selection-color: rgb(0, 255, 0);
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
    </widget>
+   <widget class="QWidget" name="networkSelect" native="true">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>441</y>
+      <width>141</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <widget class="QRadioButton" name="rbSingleplayer">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>0</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbServer">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>22</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbClient">
+     <property name="geometry">
+      <rect>
+       <x>23</x>
+       <y>46</y>
+       <width>16</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(0, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lblSingleplayer">
+     <property name="geometry">
+      <rect>
+       <x>21</x>
+       <y>2</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Standalone Game</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lblServer">
+     <property name="geometry">
+      <rect>
+       <x>38</x>
+       <y>24</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Game Server</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="lblClient">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>48</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Game Client</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLineEdit" name="lnHostname">
+    <property name="geometry">
+     <rect>
+      <x>384</x>
+      <y>519</y>
+      <width>113</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>localhost</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblHostname">
+    <property name="geometry">
+     <rect>
+      <x>296</x>
+      <y>521</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Connect to:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblPeerName">
+    <property name="geometry">
+     <rect>
+      <x>297</x>
+      <y>548</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>Connect as:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lnPeerName">
+    <property name="geometry">
+     <rect>
+      <x>385</x>
+      <y>546</y>
+      <width>113</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);
+background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>networkPlayer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblSound">
+    <property name="geometry">
+     <rect>
+      <x>388</x>
+      <y>410</y>
+      <width>51</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sounds</string>
+    </property>
+   </widget>
+   <zorder>lblSpaceship1</zorder>
+   <zorder>btnPlay</zorder>
+   <zorder>lblTitle</zorder>
+   <zorder>cbSound</zorder>
+   <zorder>lblSpaceship2</zorder>
+   <zorder>lblSpaceship3</zorder>
+   <zorder>lblSpaceship4</zorder>
+   <zorder>lblSpaceship5</zorder>
+   <zorder>radioButton</zorder>
+   <zorder>radioButton_2</zorder>
+   <zorder>radioButton_3</zorder>
+   <zorder>radioButton_4</zorder>
+   <zorder>radioButton_5</zorder>
+   <zorder>networkSelect</zorder>
+   <zorder>lnHostname</zorder>
+   <zorder>lblHostname</zorder>
+   <zorder>lblPeerName</zorder>
+   <zorder>lnPeerName</zorder>
+   <zorder>lblSound</zorder>
+   <zorder>lblSingleplayer</zorder>
+   <zorder>lblServer</zorder>
+   <zorder>lblClient</zorder>
+   <zorder>rbSingleplayer</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -252,7 +470,7 @@ selection-color: rgb(0, 255, 0);
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

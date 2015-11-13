@@ -25,6 +25,195 @@ int random_int(int min, int max) {
     return distro(engine);
 }
 
+void MainWindow::clientConnected()
+{
+    QTcpSocket *sock = server->nextPendingConnection();
+    sock->waitForReadyRead();
+    QString str = sock->readLine();
+    vector<QString> initData = splitQString(str, ':');
+    qDebug() << "Client connected: " << initData[0] << endl;
+    connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+    connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
+    Game::instance()->addPlayer(380, 190, initData[0]);
+    PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
+    lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
+    lblPlayer->getPlayer()->setPixmapName(":" + initData[1]);
+    lblPlayer->playerGen();
+    sendGameData(sock);
+}
+
+void MainWindow::clientDisconnected()
+{
+    QTcpSocket *sock = dynamic_cast<QTcpSocket*>(sender());
+    PlayerLabel *lblPlayer = nullptr;
+    QObjectList objList = ui->centralWidget->children();
+    for (QObject *lbl : objList)
+    {
+        PlayerLabel *test = dynamic_cast<PlayerLabel*>(lbl);
+        if (test != nullptr)
+        {
+            if (test->getPlayer()->getPeerName() == sock->peerName())
+            {
+                lblPlayer = test;
+            }
+        }
+    }
+    if (lblPlayer != nullptr)
+    {
+        Game::instance()->deletePlayer(lblPlayer->getPlayer()->getPeerName());
+        lblPlayer->deleteLater();
+    }
+    qDebug() << "Client disconnected." << endl;
+    sock->deleteLater();
+}
+
+void MainWindow::serverDisconnected()
+{
+    QMessageBox::information(this, "Error", "Server disconnected.");
+    QApplication::quit();
+}
+
+void MainWindow::dataReceived()
+{
+    QTcpSocket *sock = dynamic_cast<QTcpSocket*>(sender());
+    QString str = sock->readLine();
+    if (str == "SYNCH\n")
+    {
+        while (str != "SYNCHEND\n")
+        {
+            if (str == "SYNCH\n")
+            {
+                Game::instance()->newGame();
+            }
+            else
+            {
+                string line = str.toStdString();
+                switch (line[0])
+                {
+                case 'P':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int rotation = stoi(data[2]);
+                    int speed = stoi(data[3]);
+                    int angle = stoi(data[4]);
+                    QString name = QString::fromStdString(data[5]).simplified();
+                    QString pixmapName = QString::fromStdString(data[6]).simplified();
+                    Game::instance()->addPlayer(x, y, name);
+                    Game::instance()->getPlayer(name)->setRot(rotation);
+                    Game::instance()->getPlayer(name)->setSpeed(speed);
+                    Game::instance()->getPlayer(name)->setAngle(angle);
+                    Game::instance()->getPlayer(name)->setPixmapName(pixmapName);
+                    break;
+                }
+                case 'A':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int id = stoi(data[2]);
+                    int rotation = stoi(data[3]);
+                    int timedShot = stoi(data[4]);
+                    Game::instance()->addNewAlien(x, y, id, rotation);
+                    Game::instance()->getAlien(id)->setTimedShot(timedShot);
+                    break;
+                }
+                case 'S':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int angle = stoi(data[2]);
+                    int id = stoi(data[3]);
+                    bool isAlienShot;
+                    if (data[4] == "1")
+                    {
+                        isAlienShot = true;
+                    }
+                    else
+                    {
+                        isAlienShot = false;
+                    }
+                    Game::instance()->addOldShot(x, y, angle, id, isAlienShot);
+                    break;
+                }
+                case 'E':
+                {
+                    line = line.substr(1, line.size() - 1);
+                    vector<string> data = splitString(line, ',');
+                    int x = stoi(data[0]);
+                    int y = stoi(data[1]);
+                    int dX = stoi(data[2]);
+                    int dY = stoi(data[3]);
+                    int id = stoi(data[4]);
+                    Game::instance()->addOldEnemy(x, y, dX, dY, id);
+                    break;
+                }
+                }
+            }
+            str = sock->readLine();
+        }
+        resetGUI();
+    }
+    else
+    {
+        vector<QString> data = splitQString(str.simplified(), ':');
+        QObjectList objList = ui->centralWidget->children();
+        for (QObject *lbl : objList)
+        {
+            PlayerLabel *lblPlayer = dynamic_cast<PlayerLabel *>(lbl);
+            if (lblPlayer != nullptr)
+            {
+                if ((data[0] == "ACC") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
+                {
+                    lblPlayer->getPlayer()->accelerate();
+                }
+                if ((data[0] == "DEC") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
+                {
+                    lblPlayer->getPlayer()->decelerate();
+                }
+                if ((data[0] == "RTL") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
+                {
+                    lblPlayer->getPlayer()->turnLeft();
+                    lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                }
+                if ((data[0] == "RTR") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
+                {
+                    lblPlayer->getPlayer()->turnRight();
+                    lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                }
+                if ((data[0] == "SHT") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
+                {
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+
+                    ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
+
+                    lblShot->setShot(Game::instance()->getLastShot());
+                    lblShot->shotGen();
+                    if (ui->cbSound->isChecked())
+                    {
+                        pewSound->play();
+                    }
+                }
+            }
+        }
+        if (ui->rbServer->isChecked())
+        {
+            // send data to all connected clients
+            for (QObject *obj : server->children()) {
+                QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+                if (anotherSock != nullptr) {
+                    anotherSock->write(str.toLocal8Bit());
+                }
+            }
+        }
+    }
+}
+
 void MainWindow::resetGUI()
 {
     // Clear playing field of UI elements:
@@ -59,8 +248,11 @@ void MainWindow::resetGUI()
                     }
                     else
                     {
-                        // Should delete Enemies here, but they aren't
-                        // yet capable of being reloaded.
+                        EnemyLabel *lblEnemy = dynamic_cast<EnemyLabel *>(lbl);
+                        if (lblEnemy != nullptr)
+                        {
+                            lblEnemy->deleteLater();
+                        }
                     }
                 }
             }
@@ -72,9 +264,8 @@ void MainWindow::resetGUI()
     for (size_t i = 0; i < players.size(); i++)
     {
         PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
-        lblPlayer->setPlayer(Game::instance()->getPlayer());
-        QPixmap pixmap(MainWindow::shipSelect());
-        lblPlayer->playerGen(pixmap);
+        lblPlayer->setPlayer(players[i]);
+        lblPlayer->playerGen();
         lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
     }
     vector<Alien*> aliens = Game::instance()->getAliens();
@@ -92,12 +283,19 @@ void MainWindow::resetGUI()
         lblShot->setShot(shots[i]);
         lblShot->shotGen();
     }
+    vector<Enemy*> enemies = Game::instance()->getEnemies();
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        EnemyLabel *lblEnemy = new EnemyLabel(ui->centralWidget);
+        lblEnemy->setEnemy(enemies[i]);
+        lblEnemy->enemyGen();
+    }
 }
 
 void MainWindow::hideGUI()
 {
     // Hide Menu GUI
-    ui->lblMove->deleteLater();
+    ui->lblSpaceship1->hide();
     ui->lblTitle->hide();
     ui->btnPlay->hide();
     ui->cbSound->hide();
@@ -110,6 +308,36 @@ void MainWindow::hideGUI()
     ui->radioButton_3->hide();
     ui->radioButton_4->hide();
     ui->radioButton_5->hide();
+    ui->networkSelect->hide();
+    ui->lblHostname->hide();
+    ui->lnHostname->hide();
+    ui->lblPeerName->hide();
+    ui->lnPeerName->hide();
+    ui->lblSound->hide();
+}
+
+void MainWindow::showGUI()
+{
+    // Show Menu GUI
+    ui->lblSpaceship1->show();
+    ui->lblTitle->show();
+    ui->btnPlay->show();
+    ui->cbSound->show();
+    ui->lblSpaceship2->show();
+    ui->lblSpaceship3->show();
+    ui->lblSpaceship4->show();
+    ui->lblSpaceship5->show();
+    ui->radioButton->show();
+    ui->radioButton_2->show();
+    ui->radioButton_3->show();
+    ui->radioButton_4->show();
+    ui->radioButton_5->show();
+    ui->networkSelect->show();
+    ui->lblHostname->show();
+    ui->lnHostname->show();
+    ui->lblPeerName->show();
+    ui->lnPeerName->show();
+    ui->lblSound->show();
 }
 
 QString MainWindow::shipSelect()
@@ -135,11 +363,13 @@ QString MainWindow::shipSelect()
         {
             return ":/images/spaceship5.png";
         }
+        return ":/images/spaceship.png";
 }
 
 //Generates player onto the window
-void PlayerLabel::playerGen(QPixmap pixmap)
+void PlayerLabel::playerGen()
 {
+    QPixmap pixmap(getPlayer()->getPixmapName());
     setGeometry(getPlayer()->getX(), getPlayer()->getY(), 41, 41);
     setPixmap(pixmap);
     setOrigPixmap(pixmap);
@@ -242,22 +472,22 @@ void PlayerLabel::rotate(int angle)
 
 // Generate X number of enemies on the screen
 void MainWindow::makeEnemies(int num_enemy) {
-    for (size_t i = 0; i < num_enemy; ++i)
+    for (int i = 0; i <= num_enemy; ++i)
     {
         auto label_left = random_int(0, this->geometry().width() - 32);
         auto label_top = random_int(ui->btnPlay->geometry().bottom(),
                        this->geometry().height() - 32);
 
-        Enemy *alien = new Enemy(ui->centralWidget, random_int(-1,1), random_int(-1,1));
-        QPixmap evil(":/images/asteroid.png");
-        alien->enemyGen(evil, alien, label_left, label_top);
-        Game::instance()->CurrentEnemies() += 1;
+        Game::instance()->addEnemy(label_left, label_top, random_int(-1, 1), random_int(-1, 1));
+        EnemyLabel *lblEnemy = new EnemyLabel(ui->centralWidget);
+        lblEnemy->setEnemy(Game::instance()->getLastEnemy());
+        lblEnemy->enemyGen();
     }
 }
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (Game::instance()->CurrentEnemies() == 0) return true;
+    if (Game::instance()->getCurrentEnemies() == 0) return true;
     else                     return false;
 }
 
@@ -278,7 +508,7 @@ void MainWindow::advanceLevel() {
 
 
     ++Game::instance()->CurrentLevel();
-    int lvl = Game::instance()->CurrentLevel();
+    //int lvl = Game::instance()->CurrentLevel();
 
     // consider moving the following lines into a function?
     // does the same thing as init
@@ -336,35 +566,141 @@ void MainWindow::timerHit()
             lblPlayer->move((lblPlayer->getPlayer()->getX() - lblPlayer->getOffsetX()), (lblPlayer->getPlayer()->getY() - lblPlayer->getOffsetY()));
             if (upKeyPressed)
             {
-                lblPlayer->getPlayer()->accelerate();
+                if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
+                {
+                    QString msg = "ACC:" + ui->lnPeerName->text();
+                    socket->write(msg.toLocal8Bit());
+                }
+                else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
+                {
+                    lblPlayer->getPlayer()->accelerate();
+                    QString msg = "ACC:serverPlayer\n";
+                    for (QObject *obj : server->children()) {
+                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+                        if (anotherSock != nullptr) {
+                            anotherSock->write(msg.toLocal8Bit());
+                        }
+                    }
+                }
+                else if (ui->rbSingleplayer->isChecked())
+                {
+                    lblPlayer->getPlayer()->accelerate();
+                }
             }
             if (downKeyPressed)
             {
-                lblPlayer->getPlayer()->decelerate();
+                if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
+                {
+                    QString msg = "DEC:" + ui->lnPeerName->text();
+                    socket->write(msg.toLocal8Bit());
+                }
+                else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
+                {
+                    lblPlayer->getPlayer()->decelerate();
+                    QString msg = "DEC:serverPlayer\n";
+                    for (QObject *obj : server->children()) {
+                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+                        if (anotherSock != nullptr) {
+                            anotherSock->write(msg.toLocal8Bit());
+                        }
+                    }
+                }
+                else if (ui->rbSingleplayer->isChecked())
+                {
+                    lblPlayer->getPlayer()->decelerate();
+                }
             }
             if (leftKeyPressed)
             {
-                Game::instance()->getPlayer()->turnLeft();
-                lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
+                {
+                    QString msg = "RTL:" + ui->lnPeerName->text();
+                    socket->write(msg.toLocal8Bit());
+                }
+                else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
+                {
+                    lblPlayer->getPlayer()->turnLeft();
+                    lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                    QString msg = "RTL:serverPlayer\n";
+                    for (QObject *obj : server->children()) {
+                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+                        if (anotherSock != nullptr) {
+                            anotherSock->write(msg.toLocal8Bit());
+                        }
+                    }
+                }
+                else if (ui->rbSingleplayer->isChecked())
+                {
+                    lblPlayer->getPlayer()->turnLeft();
+                    lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                }
             }
             if (rightKeyPressed)
             {
-                Game::instance()->getPlayer()->turnRight();
-                lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
+                {
+                    QString msg = "RTR:" + ui->lnPeerName->text();
+                    socket->write(msg.toLocal8Bit());
+                }
+                else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
+                {
+                    lblPlayer->getPlayer()->turnRight();
+                    lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                    QString msg = "RTR:serverPlayer\n";
+                    for (QObject *obj : server->children()) {
+                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+                        if (anotherSock != nullptr) {
+                            anotherSock->write(msg.toLocal8Bit());
+                        }
+                    }
+                }
+                else if (ui->rbSingleplayer->isChecked())
+                {
+                    lblPlayer->getPlayer()->turnRight();
+                    lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
+                }
             }
             if (spacebarKeyPressed)
             {
-                //setting the shot as false (player shot)
-                Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
-
-
-                ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
-
-                lblShot->setShot(Game::instance()->getLastShot());
-                lblShot->shotGen();
-                if (ui->cbSound->isChecked())
+                if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                 {
-                    pewSound->play();
+                    QString msg = "SHT:" + ui->lnPeerName->text();
+                    socket->write(msg.toLocal8Bit());
+                }
+                else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
+                {
+                    //setting the shot as false (player shot)
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+
+                    ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
+
+                    lblShot->setShot(Game::instance()->getLastShot());
+                    lblShot->shotGen();
+                    if (ui->cbSound->isChecked())
+                    {
+                        pewSound->play();
+                    }
+                    QString msg = "SHT:serverPlayer\n";
+                    for (QObject *obj : server->children()) {
+                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+                        if (anotherSock != nullptr) {
+                            anotherSock->write(msg.toLocal8Bit());
+                        }
+                    }
+                }
+                else if (ui->rbSingleplayer->isChecked())
+                {
+                    //setting the shot as false (player shot)
+                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+
+                    ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
+
+                    lblShot->setShot(Game::instance()->getLastShot());
+                    lblShot->shotGen();
+                    if (ui->cbSound->isChecked())
+                    {
+                        pewSound->play();
+                    }
                 }
             }
 
@@ -372,7 +708,7 @@ void MainWindow::timerHit()
             //2D unit collision algorithm from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
             for (int i = 0; i < objList.size(); i++)
             {
-                Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+                EnemyLabel *test = dynamic_cast<EnemyLabel *>(objList[i]);
                 if (test != nullptr)
                 {
                    if (lblPlayer->x() < (test->x() + (test->width() / 2)) &&
@@ -444,7 +780,7 @@ void MainWindow::timerHit()
             }
             for (int i = 0; i < objList.size(); i++)
             {
-                Enemy *test = dynamic_cast<Enemy *>(objList[i]);
+                EnemyLabel *test = dynamic_cast<EnemyLabel *>(objList[i]);
                 if (test != nullptr)
                 {
                    if (lblShot->x() < (test->x() + (test->width() / 2)) &&
@@ -457,45 +793,47 @@ void MainWindow::timerHit()
                        {
                            ripAsteroid->play();
                        }
+                       Game::instance()->deleteEnemy(test->getEnemy()->getID());
                        test->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
                        lblShot->deleteLater();
-                       --Game::instance()->CurrentEnemies();
                        if(noEnemiesLeft()) {
                            advanceLevel();
                        }
                    }
                 }
+                if (!lblShot->getShot()->getIsAlienShot())
+                {
                 AlienLabel *alienTest = dynamic_cast<AlienLabel *>(objList[i]);
                 if (alienTest != nullptr)
                 {
-                   if (lblShot->x() < (alienTest->x() + (alienTest->width() / 2)) &&
+                        if (lblShot->x() < (alienTest->x() + (alienTest->width() / 2)) &&
                            (lblShot->x() + lblShot->width()) > alienTest->x() &&
-                           lblShot->y() < (alienTest->y() + (alienTest->height() / 2)) &&
+                           (lblShot->y() < (alienTest->y()) + (alienTest->height() / 2)) &&
                            ((lblShot->height() / 2) + lblShot->y()) > alienTest->y())
 
-                   {
-                       if (ui->cbSound->isChecked())
-                       {
-                           ripAsteroid->play();
-                       }
-                       Game::instance()->deleteAlien(alienTest->getAlien()->getID());
-                       alienTest->deleteLater();
-                       Game::instance()->deleteShot(lblShot->getShot()->getID());
-                       lblShot->deleteLater();
-                       --Game::instance()->CurrentEnemies();
-                       if(noEnemiesLeft()) {
-                           advanceLevel();
-                       }
-                   }
+                        {
+                            if (ui->cbSound->isChecked())
+                            {
+                                ripAsteroid->play();
+                            }
+                            Game::instance()->deleteAlien(alienTest->getAlien()->getID());
+                            alienTest->deleteLater();
+                            Game::instance()->deleteShot(lblShot->getShot()->getID());
+                            lblShot->deleteLater();
+                            if(noEnemiesLeft()) {
+                                advanceLevel();
+                            }
+                        }
+                    }
                 }
             }
         }
         //Updates an Enemy's position
-        Enemy *lblEnemy = dynamic_cast<Enemy *>(lbl);
+        EnemyLabel *lblEnemy = dynamic_cast<EnemyLabel *>(lbl);
         if (lblEnemy != nullptr)
         {
-            lblEnemy->updateEnemy(lblEnemy); //Don't ask, you can fix this if you like lol
+            lblEnemy->move(lblEnemy->getEnemy()->getX(), lblEnemy->getEnemy()->getY());
         }
     }
 }
@@ -527,6 +865,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         Game::instance()->load();
         resetGUI();
         break;
+    case Qt::Key_Escape:
+        Game::instance()->newGame();
+        resetGUI();
+        showGUI();
+        break;
     default:
         break;
     }
@@ -557,10 +900,100 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
+// Sends out the game data to all clients
+void MainWindow::sendGameData(QTcpSocket *sock)
+{
+        if (sock != nullptr) {
+    QString msg = "SYNCH\n";
+    sock->write(msg.toLocal8Bit());
+    vector<Player*> players = Game::instance()->getPlayers();
+    vector<Shot*> shots = Game::instance()->getShots();
+    vector<Alien*> aliens = Game::instance()->getAliens();
+    vector<Enemy*> enemies = Game::instance()->getEnemies();
+    for (size_t i = 0; i < players.size(); i++)
+    {
+        msg = QString::fromStdString(players[i]->getSave());
+        sock->write(msg.toLocal8Bit());
+    }
+    for (size_t i = 0; i < shots.size(); i++)
+    {
+        msg = QString::fromStdString(shots[i]->getSave());
+        sock->write(msg.toLocal8Bit());
+    }
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        msg = QString::fromStdString(aliens[i]->getSave());
+        sock->write(msg.toLocal8Bit());
+    }
+    for (size_t i = 0; i < enemies.size(); i++)
+    {
+        msg = QString::fromStdString(enemies[i]->getSave());
+        sock->write(msg.toLocal8Bit());
+    }
+    msg = "SYNCHEND\n";
+    sock->write(msg.toLocal8Bit());
+        }
+}
+
 void MainWindow::on_btnPlay_clicked()
 {
     // Initialize game
     Game::instance()->newGame();
+    if (ui->rbServer->isChecked())
+    {
+        server = new QTcpServer(this);
+        connect(server, SIGNAL(newConnection()), this, SLOT(clientConnected()));
+        if (!server->listen(QHostAddress::Any, 5000)) {
+            QMessageBox::critical(this, "Uh oh", "Cannot start socket.");
+            return;
+        }
+        // Player set-up
+        Game::instance()->addPlayer(380, 190, "serverPlayer");
+        Game::instance()->getPlayer("serverPlayer")->setPixmapName(MainWindow::shipSelect());
+        PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
+        lblPlayer->setPlayer(Game::instance()->getPlayer("serverPlayer"));
+        lblPlayer->playerGen();
+    }
+    else if (ui->rbClient->isChecked())
+    {
+        QString userName = ui->lnPeerName->text();
+        if ((userName.simplified() == "serverPlayer") || userName.contains(','))
+        {
+            QMessageBox::critical(this, "Error", "Invalid username (cannot contain commas and cannot be 'serverPlayer').");
+            return;
+        }
+        socket = new QTcpSocket(this);
+        connect(socket, SIGNAL(readyRead()), this, SLOT(dataReceived()));
+        connect(socket, SIGNAL(disconnected()), this, SLOT(serverDisconnected()));
+        QString hostname = ui->lnHostname->text();
+        if (hostname.size() == 0) {
+            QMessageBox::critical(this, "Error", "Please specify name of server.");
+            return;
+        }
+        socket->connectToHost(hostname, 5000);
+        if (!socket->waitForConnected())  {
+            QMessageBox::critical(this, "Error", "Unable to connect to server.");
+            return;
+        }
+        // Player set-up
+        Game::instance()->addPlayer(380, 190, ui->lnPeerName->text());
+        Game::instance()->getPlayer(ui->lnPeerName->text())->setPixmapName(MainWindow::shipSelect());
+        PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
+        lblPlayer->setPlayer(Game::instance()->getPlayer(ui->lnPeerName->text()));
+        lblPlayer->playerGen();
+        QString shipSelect = MainWindow::shipSelect();
+        socket->write(userName.toLocal8Bit());
+        socket->write(shipSelect.toLocal8Bit());
+    }
+    else
+    {
+        // Player set-up
+        Game::instance()->addPlayer(380, 190, "localPlayer");
+        Game::instance()->getPlayer("localPlayer")->setPixmapName(MainWindow::shipSelect());
+        PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
+        lblPlayer->setPlayer(Game::instance()->getPlayer("localPlayer"));
+        lblPlayer->playerGen();
+    }
 
     // Hide Menu GUI
     MainWindow::hideGUI();
@@ -586,7 +1019,6 @@ void MainWindow::on_btnPlay_clicked()
         lblBoss->bossGen(pixmap);
     }
 
-
     vector<Alien*> aliens = Game::instance()->getAliens();
 
     for (size_t i = 0; i < aliens.size(); i++)
@@ -596,14 +1028,6 @@ void MainWindow::on_btnPlay_clicked()
         QPixmap pixmap(":/images/alien1.png");
         lblAlien->alienGen(pixmap);
     }
-
-    Game::instance()->addPlayer(380, 190);
-
-    // Player set-up
-    PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
-    lblPlayer->setPlayer(Game::instance()->getPlayer());
-    QPixmap pixmap(MainWindow::shipSelect());
-    lblPlayer->playerGen(pixmap);
 
     // Initialize timer:
     timer->setInterval(50);

@@ -6,13 +6,14 @@
 #include <QTimer>
 #include <QSound>
 #include <QString>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QKeyEvent>
 #include <QDebug>
 #include <QPixmap>
 #include <QTransform>
 #include <QMatrix>
 #include <QMessageBox>
-#include <QSound>
 
 #include "player.h"
 #include "alien.h"
@@ -33,6 +34,8 @@ class MainWindow : public QMainWindow
     QSound *pewSound = new QSound(":/images/pew.wav");
     QSound *riperinoPlayerino = new QSound(":/images/ripplayer.wav");
     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
+    QTcpServer* server;
+    QTcpSocket* socket;
      QSound *levelUp = new QSound(":/images/levelAccomplished.wav");
      QTimer *congratsLabelTimer = new QTimer(this);
      QLabel *congratsLabel;
@@ -42,6 +45,8 @@ class MainWindow : public QMainWindow
     bool rightKeyPressed = false;
     bool leftKeyPressed = false;
     bool spacebarKeyPressed = false;
+
+    bool synching = false;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -56,12 +61,20 @@ public:
     bool noEnemiesLeft();
     void advanceLevel();
     void hideGUI();
+    void showGUI();
     QString shipSelect();
+
+    void sendGameData(QTcpSocket *sock);
 
 private slots:
     void timerHit();
     void hideMessage();
     void on_btnPlay_clicked();
+
+    void clientConnected();
+    void dataReceived();
+    void clientDisconnected();
+    void serverDisconnected();
 
 private:
     Ui::MainWindow *ui;
@@ -89,7 +102,7 @@ public:
         offsetX = 0;
         offsetY = 0;
     }
-    void playerGen(QPixmap pixmap);
+    void playerGen();
 
     int getOffsetX() { return offsetX; }
     int getOffsetY() { return offsetY; }
