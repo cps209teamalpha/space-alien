@@ -37,11 +37,13 @@ public:
     int getSpeed() { return speed; }
     QString getPeerName() { return peerName; }
     QString getPixmapName() { return pixmapName; }
+    bool getImmunity() { return isImmune; }
 
     void setRot(int rot) { rotation = rot; }
     void setAngle(int ang) { angle = ang; }
     void setSpeed(int spd) { speed = spd; }
     void setPixmapName(QString name) { pixmapName = name; }
+    void setImmuneTimer(int timer) { isImmune = true; immuneTimer = timer; }
 
     std::string getSave();
 

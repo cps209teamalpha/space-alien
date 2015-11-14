@@ -49,6 +49,8 @@ class MainWindow : public QMainWindow
 
     bool synching = false;
 
+    vector<QString> serverMsgs;
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
