@@ -34,14 +34,14 @@ class Shot
 private:
     int id;
     bool isAlienShot; //used to differentiate between player lasers and alien lasers
-    int x,y;
+    double x,y;
 
     int angle;
 public:
     Shot(int startX, int startY, int startAngle, int ID, bool alienShot): x(startX), y(startY), angle(startAngle), id(ID), isAlienShot(alienShot) { }
 
-    int getX() { return x; }
-    int getY() { return y; }
+    int getX() { return (int)round(x); }
+    int getY() { return (int)round(y); }
     int getID() { return id; }
     //obvious mutator and accessor methods
     void setIsAlienShot(bool set) { isAlienShot = set; }

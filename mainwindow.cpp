@@ -206,7 +206,7 @@ void MainWindow::dataReceived()
                 }
                 if ((data[0] == "SHT") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
                 {
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -633,19 +633,12 @@ void MainWindow::timerHit()
                 {
                     QString msg = "ACC:" + ui->lnPeerName->text();
                     serverMsgs.push_back(msg);
-                    //socket->write(msg.toLocal8Bit());
                 }
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
                     lblPlayer->getPlayer()->accelerate();
                     QString msg = "ACC:serverPlayer\n";
                     serverMsgs.push_back(msg);
-                    /*for (QObject *obj : server->children()) {
-                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
-                        if (anotherSock != nullptr) {
-                            anotherSock->write(msg.toLocal8Bit());
-                        }
-                    }*/
                 }
                 else if (ui->rbSingleplayer->isChecked())
                 {
@@ -658,19 +651,12 @@ void MainWindow::timerHit()
                 {
                     QString msg = "DEC:" + ui->lnPeerName->text();
                     serverMsgs.push_back(msg);
-                    //socket->write(msg.toLocal8Bit());
                 }
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
                     lblPlayer->getPlayer()->decelerate();
                     QString msg = "DEC:serverPlayer\n";
                     serverMsgs.push_back(msg);
-                    /*for (QObject *obj : server->children()) {
-                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
-                        if (anotherSock != nullptr) {
-                            anotherSock->write(msg.toLocal8Bit());
-                        }
-                    }*/
                 }
                 else if (ui->rbSingleplayer->isChecked())
                 {
@@ -683,7 +669,6 @@ void MainWindow::timerHit()
                 {
                     QString msg = "RTL:" + ui->lnPeerName->text();
                     serverMsgs.push_back(msg);
-                    //socket->write(msg.toLocal8Bit());
                 }
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
@@ -691,12 +676,6 @@ void MainWindow::timerHit()
                     lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
                     QString msg = "RTL:serverPlayer\n";
                     serverMsgs.push_back(msg);
-                    /*for (QObject *obj : server->children()) {
-                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
-                        if (anotherSock != nullptr) {
-                            anotherSock->write(msg.toLocal8Bit());
-                        }
-                    }*/
                 }
                 else if (ui->rbSingleplayer->isChecked())
                 {
@@ -710,7 +689,6 @@ void MainWindow::timerHit()
                 {
                     QString msg = "RTR:" + ui->lnPeerName->text();
                     serverMsgs.push_back(msg);
-                    //socket->write(msg.toLocal8Bit());
                 }
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
@@ -718,12 +696,6 @@ void MainWindow::timerHit()
                     lblPlayer->rotate(lblPlayer->getPlayer()->getRot());
                     QString msg = "RTR:serverPlayer\n";
                     serverMsgs.push_back(msg);
-                    /*for (QObject *obj : server->children()) {
-                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
-                        if (anotherSock != nullptr) {
-                            anotherSock->write(msg.toLocal8Bit());
-                        }
-                    }*/
                 }
                 else if (ui->rbSingleplayer->isChecked())
                 {
@@ -737,12 +709,11 @@ void MainWindow::timerHit()
                 {
                     QString msg = "SHT:" + ui->lnPeerName->text();
                     serverMsgs.push_back(msg);
-                    //socket->write(msg.toLocal8Bit());
                 }
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
                     //setting the shot as false (player shot)
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -754,17 +725,11 @@ void MainWindow::timerHit()
                     }
                     QString msg = "SHT:serverPlayer\n";
                     serverMsgs.push_back(msg);
-                    /*for (QObject *obj : server->children()) {
-                        QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
-                        if (anotherSock != nullptr) {
-                            anotherSock->write(msg.toLocal8Bit());
-                        }
-                    }*/
                 }
                 else if (ui->rbSingleplayer->isChecked())
                 {
                     //setting the shot as false (player shot)
-                    Game::instance()->addShot((lblPlayer->x() + 42), (lblPlayer->y() + 42), lblPlayer->getPlayer()->getRot(), false);
+                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -947,7 +912,6 @@ void MainWindow::timerHit()
     {
         if (ui->rbServer->isChecked())
         {
-            qDebug() << "Sending message '" << msg << "'' to all players...." << endl;
             for (QObject *obj : server->children()) {
                 QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
                 if (anotherSock != nullptr) {
@@ -957,7 +921,6 @@ void MainWindow::timerHit()
         }
         else if (ui->rbClient->isChecked())
         {
-            qDebug() << "Sending message '" << msg << "'' to server...." << endl;
             socket->write(msg.toLocal8Bit());
         }
     }
