@@ -63,6 +63,7 @@ public:
     void advanceLevel();
     void hideGUI();
     void showGUI();
+    void gotoMenu();
     QString shipSelect();
 
     void sendGameData(QTcpSocket *sock);

@@ -19,6 +19,8 @@ string Player::getSave()
     result += peerName.toStdString();
     result += ",";
     result += pixmapName.toStdString();
+    result += ",";
+    result += to_string(immuneTimer);
     result += "\n";
     return result;
 }
@@ -26,6 +28,15 @@ string Player::getSave()
 // Updates the player's position based on speed and direction
 void Player::move()
 {
+    if (immuneTimer > 0)
+    {
+        immuneTimer--;
+    }
+    else if (immuneTimer == 0) // Deliberately '==' instead of '<='. If immuneTimer < 0, you stay immune forever.
+    {
+        isImmune = false;
+    }
+
     double yInc;
     if (angle >= 90 && angle <= 270)
     {

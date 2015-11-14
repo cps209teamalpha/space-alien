@@ -174,7 +174,8 @@ void Game::load()
                 int angle = stoi(data[4]);
                 QString name = QString::fromStdString(data[5]);
                 QString pixmapName = QString::fromStdString(data[6]);
-                players.push_back(new Player(x, y, name));
+                int immunity = stoi(data[7]);
+                players.push_back(new Player(x, y, name, immunity));
                 players[players.size() - 1]->setRot(rotation);
                 players[players.size() - 1]->setSpeed(speed);
                 players[players.size() - 1]->setAngle(angle);

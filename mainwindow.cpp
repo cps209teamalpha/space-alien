@@ -11,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    // Initialize timer:
+    timer->setInterval(50);
+    connect(timer, SIGNAL(timeout()), this, SLOT(timerHit()));
 }
 
 MainWindow::~MainWindow()
@@ -34,7 +37,16 @@ void MainWindow::clientConnected()
     qDebug() << "Client connected: " << initData[0] << endl;
     connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
     connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
-    Game::instance()->addPlayer(380, 190, initData[0]);
+    int immunity;
+    if (ui->cbCheatMode->isChecked())
+    {
+        immunity = -1;
+    }
+    else
+    {
+        immunity = 40;
+    }
+    Game::instance()->addPlayer(380, 190, initData[0], immunity);
     PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
     lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
     lblPlayer->getPlayer()->setPixmapName(":" + initData[1]);
@@ -70,7 +82,7 @@ void MainWindow::clientDisconnected()
 void MainWindow::serverDisconnected()
 {
     QMessageBox::information(this, "Error", "Server disconnected.");
-    QApplication::quit();
+    gotoMenu();
 }
 
 void MainWindow::dataReceived()
@@ -101,7 +113,8 @@ void MainWindow::dataReceived()
                     int angle = stoi(data[4]);
                     QString name = QString::fromStdString(data[5]).simplified();
                     QString pixmapName = QString::fromStdString(data[6]).simplified();
-                    Game::instance()->addPlayer(x, y, name);
+                    int immunity = stoi(data[7]);
+                    Game::instance()->addPlayer(x, y, name, immunity);
                     Game::instance()->getPlayer(name)->setRot(rotation);
                     Game::instance()->getPlayer(name)->setSpeed(speed);
                     Game::instance()->getPlayer(name)->setAngle(angle);
@@ -314,7 +327,8 @@ void MainWindow::hideGUI()
     ui->lblPeerName->hide();
     ui->lnPeerName->hide();
     ui->lblSound->hide();
-    ui->cbGodMode->hide();
+    ui->lblCheatMode->hide();
+    ui->cbCheatMode->hide();
 }
 
 void MainWindow::showGUI()
@@ -339,6 +353,8 @@ void MainWindow::showGUI()
     ui->lblPeerName->show();
     ui->lnPeerName->show();
     ui->lblSound->show();
+    ui->lblCheatMode->show();
+    ui->cbCheatMode->show();
 }
 
 QString MainWindow::shipSelect()
@@ -559,7 +575,27 @@ void MainWindow::hideMessage()
     //slot to hide the msg and stop the timer.
     congratsLabel->hide();
     congratsLabelTimer->stop();
+}
 
+void MainWindow::gotoMenu()
+{
+    timer->stop();
+    if (ui->rbServer->isChecked())
+    {
+        for (QObject *obj : server->children()) {
+            QTcpSocket *sock = dynamic_cast<QTcpSocket*>(obj);
+            if (sock != nullptr) {
+                sock->deleteLater();
+            }
+        }
+    }
+    if (ui->rbClient->isChecked())
+    {
+        socket->deleteLater();
+    }
+    Game::instance()->newGame();
+    resetGUI();
+    showGUI();
 }
 
 //Performs different operations on each timer event
@@ -719,7 +755,7 @@ void MainWindow::timerHit()
             {
 
                 EnemyLabel *test = dynamic_cast<EnemyLabel *>(objList[i]);
-                if (test != nullptr && ui->cbGodMode->isChecked() == false)
+                if (test != nullptr && ui->cbCheatMode->isChecked() == false)
                 {
                    if (lblPlayer->x() < (test->x() + (test->width() / 2)) &&
                            (lblPlayer->x() + lblPlayer->width()) > test->x() &&
@@ -731,13 +767,13 @@ void MainWindow::timerHit()
                            riperinoPlayerino->play();
                        }
                        QMessageBox::information(this, "", "You have been DESTROYED!");
-                       QApplication::quit();
+                       gotoMenu();
                    }
                 }
                 //Collision for the player when hit by alien lasers. Only dies from alien shots.
                  ShotLabel *lblShot = dynamic_cast<ShotLabel *>(objList[i]);
 
-                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true && ui->cbGodMode->isChecked() == false)
+                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true && ui->cbCheatMode->isChecked() == false)
                  {
                      if (lblPlayer->x() < (lblShot->x() + (lblShot->width() / 2)) &&
                              (lblPlayer->x() + lblPlayer->width()) > lblShot->x() &&
@@ -749,7 +785,7 @@ void MainWindow::timerHit()
                              riperinoPlayerino->play();
                          }
                          QMessageBox::information(this, "", "You have been DESTROYED!");
-                         QApplication::quit();
+                         gotoMenu();
                          //PLAYER COLLISION END
                      }
                  }
@@ -877,9 +913,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         resetGUI();
         break;
     case Qt::Key_Escape:
-        Game::instance()->newGame();
-        resetGUI();
-        showGUI();
+        gotoMenu();
         break;
     default:
         break;
@@ -959,7 +993,16 @@ void MainWindow::on_btnPlay_clicked()
             return;
         }
         // Player set-up
-        Game::instance()->addPlayer(380, 190, "serverPlayer");
+        int immunity;
+        if (ui->cbCheatMode->isChecked())
+        {
+            immunity = -1;
+        }
+        else
+        {
+            immunity = 40;
+        }
+        Game::instance()->addPlayer(380, 190, "serverPlayer", immunity);
         Game::instance()->getPlayer("serverPlayer")->setPixmapName(MainWindow::shipSelect());
         PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
         lblPlayer->setPlayer(Game::instance()->getPlayer("serverPlayer"));
@@ -987,7 +1030,16 @@ void MainWindow::on_btnPlay_clicked()
             return;
         }
         // Player set-up
-        Game::instance()->addPlayer(380, 190, ui->lnPeerName->text());
+        int immunity;
+        if (ui->cbCheatMode->isChecked())
+        {
+            immunity = -1;
+        }
+        else
+        {
+            immunity = 40;
+        }
+        Game::instance()->addPlayer(380, 190, ui->lnPeerName->text(), immunity);
         Game::instance()->getPlayer(ui->lnPeerName->text())->setPixmapName(MainWindow::shipSelect());
         PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
         lblPlayer->setPlayer(Game::instance()->getPlayer(ui->lnPeerName->text()));
@@ -999,7 +1051,16 @@ void MainWindow::on_btnPlay_clicked()
     else
     {
         // Player set-up
-        Game::instance()->addPlayer(380, 190, "localPlayer");
+        int immunity;
+        if (ui->cbCheatMode->isChecked())
+        {
+            immunity = -1;
+        }
+        else
+        {
+            immunity = 40;
+        }
+        Game::instance()->addPlayer(380, 190, "localPlayer", immunity);
         Game::instance()->getPlayer("localPlayer")->setPixmapName(MainWindow::shipSelect());
         PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
         lblPlayer->setPlayer(Game::instance()->getPlayer("localPlayer"));
@@ -1040,8 +1101,5 @@ void MainWindow::on_btnPlay_clicked()
         lblAlien->alienGen(pixmap);
     }
 
-    // Initialize timer:
-    timer->setInterval(50);
-    connect(timer, SIGNAL(timeout()), this, SLOT(timerHit()));
     timer->start();
 }

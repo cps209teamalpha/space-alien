@@ -23,8 +23,11 @@ private:
     int angle; // the angle the ship is drifting at
     QString peerName; // The name of the network client controlling this one
     QString pixmapName; // The chosen pixmap for the ship. Used to transfer across networks
+
+    bool isImmune;
+    int immuneTimer;
 public:
-    Player(int startX, int startY, QString name): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0) { }
+    Player(int startX, int startY, QString name, int imTime): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0), isImmune(true), immuneTimer(imTime) { }
 
     // Accessor methods (mostly for debugging)
     int getX() { return x; }
