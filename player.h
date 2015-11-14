@@ -9,6 +9,8 @@
 #include <string>
 #include <math.h>
 
+void updateCoords(int &x, int &y, int speed, int angle);
+
 // The player class. In mp mode, there
 // will be multiple player objects, so
 // we may as well make it an object from
