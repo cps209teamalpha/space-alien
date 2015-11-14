@@ -98,7 +98,7 @@ public:
     void addNewAlien(int x, int y, int id, int rotation) { aliens.push_back(new Alien(x, y, id, rotation)); }
     void addOldShot(int x, int y, int angle, int id, bool alienShot) { shots.push_back(new Shot(x, y, angle, id, alienShot)); }
     void addOldEnemy(int x, int y, int deltaX, int deltaY, int id) { enemies.push_back(new Enemy(x, y, deltaX, deltaY, id)); }
-    void addPlayer(int x, int y, QString name) { players.push_back(new Player(x, y, name)); }
+    void addPlayer(int x, int y, QString name, int imTimer) { players.push_back(new Player(x, y, name, imTimer)); }
 
     void addUntrackedShot() { untrackedShots++; }
 

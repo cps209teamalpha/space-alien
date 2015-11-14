@@ -49,6 +49,8 @@ class MainWindow : public QMainWindow
 
     bool synching = false;
 
+    vector<QString> serverMsgs;
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -63,6 +65,7 @@ public:
     void advanceLevel();
     void hideGUI();
     void showGUI();
+    void gotoMenu();
     QString shipSelect();
 
     void sendGameData(QTcpSocket *sock);
