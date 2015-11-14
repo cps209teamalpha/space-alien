@@ -34,6 +34,7 @@ class MainWindow : public QMainWindow
     QSound *pewSound = new QSound(":/images/pew.wav");
     QSound *riperinoPlayerino = new QSound(":/images/ripplayer.wav");
     QSound *ripAsteroid = new QSound(":/images/asteroidexlpode.wav");
+    QSound *finalLevel = new QSound(":/images/TheEndIsComing.wav");
     QTcpServer* server;
     QTcpSocket* socket;
      QSound *levelUp = new QSound(":/images/levelAccomplished.wav");

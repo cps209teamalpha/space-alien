@@ -23,5 +23,6 @@
         <file>images/mrj.png</file>
         <file>images/mrj2.png</file>
         <file>images/levelAccomplished.wav</file>
+        <file>images/TheEndIsComing.wav</file>
     </qresource>
 </RCC>
