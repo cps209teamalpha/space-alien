@@ -314,6 +314,7 @@ void MainWindow::hideGUI()
     ui->lblPeerName->hide();
     ui->lnPeerName->hide();
     ui->lblSound->hide();
+    ui->cbGodMode->hide();
 }
 
 void MainWindow::showGUI()
@@ -487,14 +488,17 @@ void MainWindow::makeEnemies(int num_enemy) {
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (Game::instance()->getCurrentEnemies() == 0) return true;
+    if (Game::instance()->getCurrentEnemies() <= 0) return true;
     else                     return false;
 }
 
 // lazy level implementation
 void MainWindow::advanceLevel() {
     //Plays a sound before level advances
+    if (ui->cbSound->isChecked() && Game::instance()->CurrentLevel() < 5)
+    {
     levelUp->play();
+    }
 
     //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
         congratsLabel = new QLabel(this);
@@ -513,7 +517,12 @@ void MainWindow::advanceLevel() {
     // consider moving the following lines into a function?
     // does the same thing as init
 
-    if(Game::instance()->CurrentLevel() == 5) {
+    if(Game::instance()->CurrentLevel() >= 5) {
+
+        if (ui->cbSound->isChecked())
+        {
+            finalLevel->play();
+        }
         Game::instance()->addBoss(50, 50);
 
         vector<Boss*> bosses = Game::instance()->getBosses();
@@ -704,12 +713,13 @@ void MainWindow::timerHit()
                 }
             }
 
-            //Collision
+            // PLAYER START Collision
             //2D unit collision algorithm from: https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
             for (int i = 0; i < objList.size(); i++)
             {
+
                 EnemyLabel *test = dynamic_cast<EnemyLabel *>(objList[i]);
-                if (test != nullptr)
+                if (test != nullptr && ui->cbGodMode->isChecked() == false)
                 {
                    if (lblPlayer->x() < (test->x() + (test->width() / 2)) &&
                            (lblPlayer->x() + lblPlayer->width()) > test->x() &&
@@ -727,7 +737,7 @@ void MainWindow::timerHit()
                 //Collision for the player when hit by alien lasers. Only dies from alien shots.
                  ShotLabel *lblShot = dynamic_cast<ShotLabel *>(objList[i]);
 
-                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true)
+                 if (lblShot != nullptr && lblShot->getShot()->getIsAlienShot() == true && ui->cbGodMode->isChecked() == false)
                  {
                      if (lblPlayer->x() < (lblShot->x() + (lblShot->width() / 2)) &&
                              (lblPlayer->x() + lblPlayer->width()) > lblShot->x() &&
@@ -740,6 +750,7 @@ void MainWindow::timerHit()
                          }
                          QMessageBox::information(this, "", "You have been DESTROYED!");
                          QApplication::quit();
+                         //PLAYER COLLISION END
                      }
                  }
             }

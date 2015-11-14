@@ -440,29 +440,19 @@ background-color: rgb(255, 255, 255);</string>
      <string>Sounds</string>
     </property>
    </widget>
-   <zorder>lblSpaceship1</zorder>
-   <zorder>btnPlay</zorder>
-   <zorder>lblTitle</zorder>
-   <zorder>cbSound</zorder>
-   <zorder>lblSpaceship2</zorder>
-   <zorder>lblSpaceship3</zorder>
-   <zorder>lblSpaceship4</zorder>
-   <zorder>lblSpaceship5</zorder>
-   <zorder>radioButton</zorder>
-   <zorder>radioButton_2</zorder>
-   <zorder>radioButton_3</zorder>
-   <zorder>radioButton_4</zorder>
-   <zorder>radioButton_5</zorder>
-   <zorder>networkSelect</zorder>
-   <zorder>lnHostname</zorder>
-   <zorder>lblHostname</zorder>
-   <zorder>lblPeerName</zorder>
-   <zorder>lnPeerName</zorder>
-   <zorder>lblSound</zorder>
-   <zorder>lblSingleplayer</zorder>
-   <zorder>lblServer</zorder>
-   <zorder>lblClient</zorder>
-   <zorder>rbSingleplayer</zorder>
+   <widget class="QCheckBox" name="cbGodMode">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>410</y>
+      <width>97</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>God Mode</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -470,7 +460,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
