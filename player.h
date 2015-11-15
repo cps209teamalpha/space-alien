@@ -9,6 +9,8 @@
 #include <string>
 #include <math.h>
 
+void updateCoords(double &x, double &y, int speed, int angle);
+
 // The player class. In mp mode, there
 // will be multiple player objects, so
 // we may as well make it an object from
@@ -18,27 +20,32 @@ class Player
 {
 private:
     int rotation; // The direction the ship is pointing (360 degrees)
-    int x, y; // x, y = current ship loc - int, to get proper movement. Should be rounded to ints for graphics purposes
+    double x, y; // x, y = current ship loc - int, to get proper movement. Should be rounded to ints for graphics purposes
     int speed; // the current speed the ship is traveling at (may be rewritten)
     int angle; // the angle the ship is drifting at
     QString peerName; // The name of the network client controlling this one
     QString pixmapName; // The chosen pixmap for the ship. Used to transfer across networks
+
+    bool isImmune;
+    int immuneTimer;
 public:
-    Player(int startX, int startY, QString name): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0) { }
+    Player(int startX, int startY, QString name, int imTime): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0), isImmune(true), immuneTimer(imTime) { }
 
     // Accessor methods (mostly for debugging)
-    int getX() { return x; }
-    int getY() { return y; }
+    int getX() { return (int)round(x); }
+    int getY() { return (int)round(y); }
     int getRot() { return rotation; }
     int getAngle() { return angle; }
     int getSpeed() { return speed; }
     QString getPeerName() { return peerName; }
     QString getPixmapName() { return pixmapName; }
+    bool getImmunity() { return isImmune; }
 
     void setRot(int rot) { rotation = rot; }
     void setAngle(int ang) { angle = ang; }
     void setSpeed(int spd) { speed = spd; }
     void setPixmapName(QString name) { pixmapName = name; }
+    void setImmuneTimer(int timer) { isImmune = true; immuneTimer = timer; }
 
     std::string getSave();
 

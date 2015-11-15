@@ -2,6 +2,14 @@
 
 using namespace std;
 
+void updateCoords(double &x, double &y, int speed, int angle)
+{
+    double yInc = -1 * speed * cos(angle * M_PI / 180);
+    double xInc = speed * sin(angle * M_PI / 180);
+    x += xInc;
+    y += yInc;
+}
+
 // Returns a string to be saved to the save file
 string Player::getSave()
 {
@@ -19,6 +27,8 @@ string Player::getSave()
     result += peerName.toStdString();
     result += ",";
     result += pixmapName.toStdString();
+    result += ",";
+    result += to_string(immuneTimer);
     result += "\n";
     return result;
 }
@@ -26,19 +36,16 @@ string Player::getSave()
 // Updates the player's position based on speed and direction
 void Player::move()
 {
-    double yInc;
-    if (angle >= 90 && angle <= 270)
+    if (immuneTimer > 0)
     {
-        yInc = sqrt(speed + (speed * sin(angle * M_PI / 180)));
+        immuneTimer--;
     }
-    else
+    else if (immuneTimer == 0) // Deliberately '==' instead of '<='. If immuneTimer < 0, you stay immune forever.
     {
-        yInc = -1 * sqrt(speed - (speed * sin(angle * M_PI / 180)));
+        isImmune = false;
     }
-    double xInc = speed * sin(angle * M_PI / 180);
-    // qDebug() << "Angle: " << angle << "(sin " << sin(angle * M_PI / 180) << ") yInc: " << yInc << "xInc: " << xInc << endl;
-    x += xInc;
-    y += yInc;
+
+    updateCoords(x, y, speed, angle);
 
     if (x >= 800)
     {

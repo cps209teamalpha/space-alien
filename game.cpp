@@ -174,7 +174,8 @@ void Game::load()
                 int angle = stoi(data[4]);
                 QString name = QString::fromStdString(data[5]);
                 QString pixmapName = QString::fromStdString(data[6]);
-                players.push_back(new Player(x, y, name));
+                int immunity = stoi(data[7]);
+                players.push_back(new Player(x, y, name, immunity));
                 players[players.size() - 1]->setRot(rotation);
                 players[players.size() - 1]->setSpeed(speed);
                 players[players.size() - 1]->setAngle(angle);
@@ -426,18 +427,7 @@ string Shot::getSave()
 
 void Shot::move()
 {
-    double yInc;
-    if (angle >= 90 && angle <= 270)
-    {
-        yInc = sqrt(30 + (30 * sin(angle * M_PI / 180)));
-    }
-    else
-    {
-        yInc = -1 * sqrt(30 - (30 * sin(angle * M_PI / 180)));
-    }
-    double xInc = 30 * sin(angle * M_PI / 180);
-    x += xInc;
-    y += yInc;
+    updateCoords(x, y, 30, angle);
 }
 
 // Default constructor for Highscore object

@@ -83,7 +83,7 @@ selection-color: rgb(0, 255, 0);
    <widget class="QCheckBox" name="cbSound">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>310</x>
       <y>411</y>
       <width>16</width>
       <height>17</height>
@@ -430,7 +430,7 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="lblSound">
     <property name="geometry">
      <rect>
-      <x>388</x>
+      <x>328</x>
       <y>410</y>
       <width>51</width>
       <height>16</height>
@@ -440,17 +440,33 @@ background-color: rgb(255, 255, 255);</string>
      <string>Sounds</string>
     </property>
    </widget>
-   <widget class="QCheckBox" name="cbGodMode">
+   <widget class="QCheckBox" name="cbCheatMode">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>410</y>
-      <width>97</width>
+      <x>400</x>
+      <y>407</y>
+      <width>16</width>
       <height>22</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(0, 0, 0);</string>
+    </property>
     <property name="text">
-     <string>God Mode</string>
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblCheatMode">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>410</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cheat Mode</string>
     </property>
    </widget>
   </widget>
@@ -460,7 +476,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
