@@ -5,6 +5,42 @@
 #define M_PI (atan(1) * 4)
 #endif
 
+void ConnectionNames::addRecord(QString name, QString address, quint16 port)
+{
+    names.push_back(name);
+    addresses.push_back(address);
+    ports.push_back(port);
+}
+
+void ConnectionNames::deleteRecord(QString name)
+{
+    int index = -1;
+    for (size_t i = 0; i < names.size(); i++)
+    {
+        if (names[i] == name)
+        {
+            index = i;
+        }
+    }
+    if (index >= 0)
+    {
+        names.erase(names.begin() + index);
+        addresses.erase(addresses.begin() + index);
+        ports.erase(ports.begin() + index);
+    }
+}
+
+QString ConnectionNames::getName(QString address, quint16 port)
+{
+    for (size_t i = 0; i < addresses.size(); i++)
+    {
+        if ((addresses[i] == address) && (ports[i] == port))
+        {
+            return names[i];
+        }
+    }
+    return "";
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,10 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Initialize timer:
     timer->setInterval(50);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerHit()));
+    connectionNames = new ConnectionNames();
 }
 
 MainWindow::~MainWindow()
 {
+    delete connectionNames;
     delete ui;
 }
 
@@ -51,12 +89,14 @@ void MainWindow::clientConnected()
     lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
     lblPlayer->getPlayer()->setPixmapName(":" + initData[1]);
     lblPlayer->playerGen();
+    connectionNames->addRecord(initData[0], sock->peerAddress().toString(), sock->peerPort());
     sendGameData(sock);
 }
 
 void MainWindow::clientDisconnected()
 {
     QTcpSocket *sock = dynamic_cast<QTcpSocket*>(sender());
+    QString clientName = connectionNames->getName(sock->peerAddress().toString(), sock->peerPort());
     PlayerLabel *lblPlayer = nullptr;
     QObjectList objList = ui->centralWidget->children();
     for (QObject *lbl : objList)
@@ -64,7 +104,7 @@ void MainWindow::clientDisconnected()
         PlayerLabel *test = dynamic_cast<PlayerLabel*>(lbl);
         if (test != nullptr)
         {
-            if (test->getPlayer()->getPeerName() == sock->peerName())
+            if (test->getPlayer()->getPeerName() == clientName)
             {
                 lblPlayer = test;
             }
@@ -72,10 +112,10 @@ void MainWindow::clientDisconnected()
     }
     if (lblPlayer != nullptr)
     {
-        Game::instance()->deletePlayer(lblPlayer->getPlayer()->getPeerName());
+        Game::instance()->deletePlayer(clientName);
         lblPlayer->deleteLater();
     }
-    qDebug() << "Client disconnected." << endl;
+    qDebug() << "Client disconnected: " << clientName << endl;
     sock->deleteLater();
 }
 
