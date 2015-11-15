@@ -96,6 +96,7 @@ void MainWindow::clientConnected()
 void MainWindow::clientDisconnected()
 {
     QTcpSocket *sock = dynamic_cast<QTcpSocket*>(sender());
+    qDebug() << "Client address: " << sock->peerAddress().toString() << endl;
     QString clientName = connectionNames->getName(sock->peerAddress().toString(), sock->peerPort());
     PlayerLabel *lblPlayer = nullptr;
     QObjectList objList = ui->centralWidget->children();
@@ -588,7 +589,7 @@ void MainWindow::advanceLevel() {
     // consider moving the following lines into a function?
     // does the same thing as init
 
-    if(Game::instance()->CurrentLevel() >= 5) {
+    if(Game::instance()->CurrentLevel() >= 500) {
 
         if (ui->cbSound->isChecked())
         {
@@ -623,6 +624,15 @@ void MainWindow::advanceLevel() {
         }
     }
 
+    if (ui->rbServer->isChecked())
+    {
+        for (QObject *obj : server->children()) {
+            QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+            if (anotherSock != nullptr) {
+                sendGameData(anotherSock);
+            }
+        }
+    }
 }
 
 void MainWindow::hideMessage()
