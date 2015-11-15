@@ -72,7 +72,7 @@ void MainWindow::clientConnected()
     sock->waitForReadyRead();
     QString str = sock->readLine();
     vector<QString> initData = splitQString(str, ':');
-    qDebug() << "Client connected: " << initData[0] << endl;
+    qDebug() << "Client '" << initData[0] << "' connected from " << sock->peerAddress().toString() << endl;
     connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
     connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
     int immunity;
@@ -315,6 +315,14 @@ void MainWindow::resetGUI()
                         {
                             lblEnemy->deleteLater();
                         }
+                        else
+                        {
+                            BossLabel *lblBoss = dynamic_cast<BossLabel *>(lbl);
+                            if(lblBoss != nullptr)
+                            {
+                                lblBoss->deleteLater();
+                            }
+                        }
                     }
                 }
             }
@@ -537,9 +545,9 @@ void PlayerLabel::rotate(int angle)
     setPixmap(pixmap);
 }
 
-// Generate X number of enemies on the screen
-void MainWindow::makeEnemies(int num_enemy) {
-    for (int i = 0; i <= num_enemy; ++i)
+// Generate X number of asteroids on the screen
+void MainWindow::makeEnemies(int NumEnemy) {
+    for (int i = 0; i <= NumEnemy; ++i)
     {
         auto label_left = random_int(0, this->geometry().width() - 32);
         auto label_top = random_int(ui->btnPlay->geometry().bottom(),
@@ -554,8 +562,21 @@ void MainWindow::makeEnemies(int num_enemy) {
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (Game::instance()->getCurrentEnemies() <= 0) return true;
-    else                     return false;
+    if   (Game::instance()->getCurrentEnemies() <= 0) return true;
+    else                                              return false;
+}
+
+void MainWindow::showCongrats()
+{
+    //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
+        congratsLabel = new QLabel(this);
+    congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
+        congratsLabel->adjustSize();
+        congratsLabel->move(230, 270);
+    congratsLabel->show();
+
+    connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
+    congratsLabelTimer->start(3000);
 }
 
 // lazy level implementation
@@ -566,20 +587,15 @@ void MainWindow::advanceLevel() {
     levelUp->play();
     }
 
-    //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
-        congratsLabel = new QLabel(this);
-    congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
-        congratsLabel->adjustSize();
-        congratsLabel->move(230, 270);
-    congratsLabel->show();
-
-    connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
-    congratsLabelTimer->start(3000);
+    showCongrats();
 
     vector<Player*> players = Game::instance()->getPlayers();
     for (size_t i = 0; i < players.size(); i++)
     {
-        players[i]->setImmuneTimer(40);
+        if (players[i]->getImmuneTimer() >= 0)
+        {
+            players[i]->setImmuneTimer(40);
+        }
     }
 
     ++Game::instance()->CurrentLevel();
@@ -606,7 +622,7 @@ void MainWindow::advanceLevel() {
         }
     }
     else {
-        makeEnemies(Game::instance()->Num_enemy() * Game::instance()->CurrentLevel());
+        makeEnemies(Game::instance()->NumEnemy() * Game::instance()->CurrentLevel());
         Game::instance()->addAlien(0);
         Game::instance()->addAlien(90);
         Game::instance()->addAlien(180);
@@ -817,7 +833,7 @@ void MainWindow::timerHit()
                        {
                            riperinoPlayerino->play();
                        }
-                       if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lblPeerName->text()))
+                       if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                        {
                             QMessageBox::information(this, "", "You have been DESTROYED!");
                             gotoMenu();
@@ -848,7 +864,7 @@ void MainWindow::timerHit()
                          {
                              riperinoPlayerino->play();
                          }
-                         if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lblPeerName->text()))
+                         if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                          {
                               QMessageBox::information(this, "", "You have been DESTROYED!");
                               gotoMenu();
@@ -1170,26 +1186,19 @@ void MainWindow::on_btnPlay_clicked()
     // Hide Menu GUI
     MainWindow::hideGUI();
 
+    // Show score labels
+    ui->lblHighscoreText->show();
+    ui->lblHighScore->show();
+    ui->lblScore->show();
+
     // Enemy set-up
-    Game::instance()->Num_enemy() = 5; //This amount for level 1 and PoC purposes
-    makeEnemies(Game::instance()->Num_enemy());
+    Game::instance()->NumEnemy() = 5; //This amount for level 1 and PoC purposes
+    makeEnemies(Game::instance()->NumEnemy());
 
     Game::instance()->addAlien(0);
     Game::instance()->addAlien(90);
     Game::instance()->addAlien(180);
     Game::instance()->addAlien(270);
-
-    // Summons Mr. Jueckstock to the battlefield
-    //Game::instance()->addBoss();
-
-    vector<Boss*> bosses = Game::instance()->getBosses();
-
-    for (size_t i = 0; i < bosses.size(); i++) {
-        BossLabel *lblBoss = new BossLabel(ui->centralWidget);
-        lblBoss->setBoss(bosses.at(i));
-        QPixmap pixmap(":/images/mrj.png");
-        lblBoss->bossGen(pixmap);
-    }
 
     vector<Alien*> aliens = Game::instance()->getAliens();
 
