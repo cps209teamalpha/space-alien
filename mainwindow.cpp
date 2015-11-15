@@ -882,6 +882,36 @@ void MainWindow::timerHit()
                          //PLAYER COLLISION END
                      }
                  }
+                AlienLabel *lblAliensu = dynamic_cast<AlienLabel *>(objList[i]);
+                if (lblAliensu != nullptr && lblPlayer->getPlayer()->getImmunity() == false)
+                {
+                    if (lblPlayer->x() < (lblAliensu->x() + (lblAliensu->width() / 2)) &&
+                            (lblPlayer->x() + lblPlayer->width()) > lblAliensu->x() &&
+                            lblPlayer->y() < (lblAliensu->y() + (lblAliensu->height() / 2)) &&
+                            ((lblPlayer->height() / 2) + lblPlayer->y()) > lblAliensu->y())
+                    {
+                        if (ui->cbSound->isChecked())
+                        {
+                            riperinoPlayerino->play();
+                        }
+                        if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
+                        {
+                             QMessageBox::information(this, "", "You have been DESTROYED!");
+                             gotoMenu();
+                        }
+                        else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
+                        {
+                            QMessageBox::information(this, "", "You have been DESTROYED!");
+                            gotoMenu();
+                        }
+                        else if (ui->rbSingleplayer->isChecked())
+                        {
+                            QMessageBox::information(this, "", "You have been DESTROYED!");
+                            gotoMenu();
+                        }
+                        //PLAYER COLLISION END
+                    }
+                }
             }
 
         }
