@@ -84,6 +84,7 @@ public:
     void showGUI();
     void gotoMenu();
     QString shipSelect();
+    void showCongrats();
 
     void sendGameData(QTcpSocket *sock);
 

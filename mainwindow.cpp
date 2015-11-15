@@ -72,7 +72,7 @@ void MainWindow::clientConnected()
     sock->waitForReadyRead();
     QString str = sock->readLine();
     vector<QString> initData = splitQString(str, ':');
-    qDebug() << "Client connected: " << initData[0] << endl;
+    qDebug() << "Client '" << initData[0] << "' connected from " << sock->peerAddress().toString() << endl;
     connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
     connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
     int immunity;
@@ -558,14 +558,8 @@ bool MainWindow::noEnemiesLeft() {
     else                     return false;
 }
 
-// lazy level implementation
-void MainWindow::advanceLevel() {
-    //Plays a sound before level advances
-    if (ui->cbSound->isChecked() && Game::instance()->CurrentLevel() < 5)
-    {
-    levelUp->play();
-    }
-
+void MainWindow::showCongrats()
+{
     //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
         congratsLabel = new QLabel(this);
     congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
@@ -575,11 +569,25 @@ void MainWindow::advanceLevel() {
 
     connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
     congratsLabelTimer->start(3000);
+}
+
+// lazy level implementation
+void MainWindow::advanceLevel() {
+    //Plays a sound before level advances
+    if (ui->cbSound->isChecked() && Game::instance()->CurrentLevel() < 5)
+    {
+    levelUp->play();
+    }
+
+    showCongrats();
 
     vector<Player*> players = Game::instance()->getPlayers();
     for (size_t i = 0; i < players.size(); i++)
     {
-        players[i]->setImmuneTimer(40);
+        if (players[i]->getImmuneTimer() >= 0)
+        {
+            players[i]->setImmuneTimer(40);
+        }
     }
 
     ++Game::instance()->CurrentLevel();
@@ -817,7 +825,7 @@ void MainWindow::timerHit()
                        {
                            riperinoPlayerino->play();
                        }
-                       if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lblPeerName->text()))
+                       if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                        {
                             QMessageBox::information(this, "", "You have been DESTROYED!");
                             gotoMenu();
@@ -848,7 +856,7 @@ void MainWindow::timerHit()
                          {
                              riperinoPlayerino->play();
                          }
-                         if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lblPeerName->text()))
+                         if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                          {
                               QMessageBox::information(this, "", "You have been DESTROYED!");
                               gotoMenu();
