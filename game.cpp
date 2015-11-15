@@ -76,6 +76,7 @@ void Game::newGame()
     nextShot = 0;
     nextAlien = 0;
     nextEnemy = 0;
+    currentLevel = 1;
     untrackedShots = 0;
 }
 
