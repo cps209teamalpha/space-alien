@@ -494,7 +494,7 @@ void PlayerLabel::rotate(int angle)
     setPixmap(pixmap);
 }
 
-// Generate X number of enemies on the screen
+// Generate X number of asteroids on the screen
 void MainWindow::makeEnemies(int num_enemy) {
     for (int i = 0; i <= num_enemy; ++i)
     {
@@ -511,11 +511,11 @@ void MainWindow::makeEnemies(int num_enemy) {
 
 // If no enemies are left, return true
 bool MainWindow::noEnemiesLeft() {
-    if (Game::instance()->getCurrentEnemies() <= 0) return true;
-    else                     return false;
+    if   (Game::instance()->getCurrentEnemies() <= 0) return true;
+    else                                              return false;
 }
 
-// lazy level implementation
+// Level implementation
 void MainWindow::advanceLevel() {
     //Plays a sound before level advances
     if (ui->cbSound->isChecked() && Game::instance()->CurrentLevel() < 5)
