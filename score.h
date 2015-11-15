@@ -7,7 +7,7 @@
 class Score
 {
     static std::size_t value;
-    static std::size_t highscoreValue;
+    static std::size_t hsValue;
 
 public:
     Score();
@@ -20,8 +20,8 @@ public:
     static void load(std::ifstream&);
     static void load(std::string);
 
-    static std::size_t &Value() { return value; }
-    static std::size_t &HighscoreValue() { return highscoreValue; }
+    static std::size_t &Value()          { return value;   }
+    static std::size_t &HighscoreValue() { return hsValue; }
 
 };
 

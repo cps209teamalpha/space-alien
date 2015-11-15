@@ -20,6 +20,7 @@
 #include "boss.h"
 #include "game.h"
 #include "enemyspawn.h"
+#include "score.h"
 
 namespace Ui {
 class MainWindow;

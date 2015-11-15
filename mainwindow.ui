@@ -469,7 +469,7 @@ background-color: rgb(255, 255, 255);</string>
      <string>Cheat Mode</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="lblHighScore">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -485,7 +485,7 @@ background-color: rgb(255, 255, 255);</string>
      <set>Qt::AlignHCenter|Qt::AlignTop</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="lblScore">
     <property name="geometry">
      <rect>
       <x>580</x>
@@ -502,6 +502,9 @@ background-color: rgb(255, 255, 255);</string>
     </property>
    </widget>
    <widget class="QLabel" name="lblHighscoreText">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>290</x>

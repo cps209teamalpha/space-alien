@@ -272,6 +272,14 @@ void MainWindow::resetGUI()
                         {
                             lblEnemy->deleteLater();
                         }
+                        else
+                        {
+                            BossLabel *lblBoss = dynamic_cast<BossLabel *>(lbl);
+                            if(lblBoss != nullptr)
+                            {
+                                lblEnemy->deleteLater();
+                            }
+                        }
                     }
                 }
             }
@@ -495,8 +503,8 @@ void PlayerLabel::rotate(int angle)
 }
 
 // Generate X number of asteroids on the screen
-void MainWindow::makeEnemies(int num_enemy) {
-    for (int i = 0; i <= num_enemy; ++i)
+void MainWindow::makeEnemies(int NumEnemy) {
+    for (int i = 0; i <= NumEnemy; ++i)
     {
         auto label_left = random_int(0, this->geometry().width() - 32);
         auto label_top = random_int(ui->btnPlay->geometry().bottom(),
@@ -563,7 +571,7 @@ void MainWindow::advanceLevel() {
         }
     }
     else {
-        makeEnemies(Game::instance()->Num_enemy() * Game::instance()->CurrentLevel());
+        makeEnemies(Game::instance()->NumEnemy() * Game::instance()->CurrentLevel());
         Game::instance()->addAlien(0);
         Game::instance()->addAlien(90);
         Game::instance()->addAlien(180);
@@ -1112,26 +1120,19 @@ void MainWindow::on_btnPlay_clicked()
     // Hide Menu GUI
     MainWindow::hideGUI();
 
+    // Show score labels
+    ui->lblHighscoreText->show();
+    ui->lblHighScore->show();
+    ui->lblScore->show();
+
     // Enemy set-up
-    Game::instance()->Num_enemy() = 5; //This amount for level 1 and PoC purposes
-    makeEnemies(Game::instance()->Num_enemy());
+    Game::instance()->NumEnemy() = 5; //This amount for level 1 and PoC purposes
+    makeEnemies(Game::instance()->NumEnemy());
 
     Game::instance()->addAlien(0);
     Game::instance()->addAlien(90);
     Game::instance()->addAlien(180);
     Game::instance()->addAlien(270);
-
-    // Summons Mr. Jueckstock to the battlefield
-    //Game::instance()->addBoss();
-
-    vector<Boss*> bosses = Game::instance()->getBosses();
-
-    for (size_t i = 0; i < bosses.size(); i++) {
-        BossLabel *lblBoss = new BossLabel(ui->centralWidget);
-        lblBoss->setBoss(bosses.at(i));
-        QPixmap pixmap(":/images/mrj.png");
-        lblBoss->bossGen(pixmap);
-    }
 
     vector<Alien*> aliens = Game::instance()->getAliens();
 

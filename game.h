@@ -87,7 +87,7 @@ public:
     // Updates player & enemies, for use with a timer
     void updateField();
 
-    int &Num_enemy() { return numEnemy; }
+    int &NumEnemy() { return numEnemy; }
     int &CurrentLevel() { return currentLevel; }
     int getCurrentEnemies() { return (int)enemies.size(); }
 
