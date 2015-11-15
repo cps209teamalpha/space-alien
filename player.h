@@ -9,6 +9,8 @@
 #include <string>
 #include <math.h>
 
+void updateCoords(double &x, double &y, int speed, int angle);
+
 // The player class. In mp mode, there
 // will be multiple player objects, so
 // we may as well make it an object from
@@ -18,7 +20,7 @@ class Player
 {
 private:
     int rotation; // The direction the ship is pointing (360 degrees)
-    int x, y; // x, y = current ship loc - int, to get proper movement. Should be rounded to ints for graphics purposes
+    double x, y; // x, y = current ship loc - int, to get proper movement. Should be rounded to ints for graphics purposes
     int speed; // the current speed the ship is traveling at (may be rewritten)
     int angle; // the angle the ship is drifting at
     QString peerName; // The name of the network client controlling this one
@@ -30,8 +32,8 @@ public:
     Player(int startX, int startY, QString name, int imTime): x(startX), y(startY), peerName(name), rotation(0), speed(0), angle(0), isImmune(true), immuneTimer(imTime) { }
 
     // Accessor methods (mostly for debugging)
-    int getX() { return x; }
-    int getY() { return y; }
+    int getX() { return (int)round(x); }
+    int getY() { return (int)round(y); }
     int getRot() { return rotation; }
     int getAngle() { return angle; }
     int getSpeed() { return speed; }
