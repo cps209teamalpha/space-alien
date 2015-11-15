@@ -649,7 +649,7 @@ void MainWindow::gotoMenu()
         for (QObject *obj : server->children()) {
             QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
             if (anotherSock != nullptr) {
-                anotherSock->deleteLater();
+                anotherSock->disconnectFromHost();
             }
         }
         server->deleteLater();
