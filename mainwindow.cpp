@@ -5,6 +5,42 @@
 #define M_PI (atan(1) * 4)
 #endif
 
+void ConnectionNames::addRecord(QString name, QString address, quint16 port)
+{
+    names.push_back(name);
+    addresses.push_back(address);
+    ports.push_back(port);
+}
+
+void ConnectionNames::deleteRecord(QString name)
+{
+    int index = -1;
+    for (size_t i = 0; i < names.size(); i++)
+    {
+        if (names[i] == name)
+        {
+            index = i;
+        }
+    }
+    if (index >= 0)
+    {
+        names.erase(names.begin() + index);
+        addresses.erase(addresses.begin() + index);
+        ports.erase(ports.begin() + index);
+    }
+}
+
+QString ConnectionNames::getName(QString address, quint16 port)
+{
+    for (size_t i = 0; i < addresses.size(); i++)
+    {
+        if ((addresses[i] == address) && (ports[i] == port))
+        {
+            return names[i];
+        }
+    }
+    return "";
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -14,10 +50,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Initialize timer:
     timer->setInterval(50);
     connect(timer, SIGNAL(timeout()), this, SLOT(timerHit()));
+    connectionNames = new ConnectionNames();
 }
 
 MainWindow::~MainWindow()
 {
+    delete connectionNames;
     delete ui;
 }
 
@@ -34,7 +72,7 @@ void MainWindow::clientConnected()
     sock->waitForReadyRead();
     QString str = sock->readLine();
     vector<QString> initData = splitQString(str, ':');
-    qDebug() << "Client connected: " << initData[0] << endl;
+    qDebug() << "Client '" << initData[0] << "' connected from " << sock->peerAddress().toString() << endl;
     connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
     connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
     int immunity;
@@ -51,12 +89,14 @@ void MainWindow::clientConnected()
     lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
     lblPlayer->getPlayer()->setPixmapName(":" + initData[1]);
     lblPlayer->playerGen();
+    connectionNames->addRecord(initData[0], sock->peerAddress().toString(), sock->peerPort());
     sendGameData(sock);
 }
 
 void MainWindow::clientDisconnected()
 {
     QTcpSocket *sock = dynamic_cast<QTcpSocket*>(sender());
+    QString clientName = connectionNames->getName(sock->peerAddress().toString(), sock->peerPort());
     PlayerLabel *lblPlayer = nullptr;
     QObjectList objList = ui->centralWidget->children();
     for (QObject *lbl : objList)
@@ -64,7 +104,7 @@ void MainWindow::clientDisconnected()
         PlayerLabel *test = dynamic_cast<PlayerLabel*>(lbl);
         if (test != nullptr)
         {
-            if (test->getPlayer()->getPeerName() == sock->peerName())
+            if (test->getPlayer()->getPeerName() == clientName)
             {
                 lblPlayer = test;
             }
@@ -72,10 +112,10 @@ void MainWindow::clientDisconnected()
     }
     if (lblPlayer != nullptr)
     {
-        Game::instance()->deletePlayer(lblPlayer->getPlayer()->getPeerName());
+        Game::instance()->deletePlayer(clientName);
         lblPlayer->deleteLater();
     }
-    qDebug() << "Client disconnected." << endl;
+    qDebug() << "Client disconnected: " << clientName << endl;
     sock->deleteLater();
 }
 
@@ -206,7 +246,10 @@ void MainWindow::dataReceived()
                 }
                 if ((data[0] == "SHT") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
                 {
-                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
+                    double shotX = lblPlayer->x() + (lblPlayer->width() / 2) - 10;
+                    double shotY = lblPlayer->y() + (lblPlayer->height() / 2) - 10;
+                    updateCoords(shotX, shotY, 30, lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot(shotX, shotY, lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -523,14 +566,8 @@ bool MainWindow::noEnemiesLeft() {
     else                                              return false;
 }
 
-// Level implementation
-void MainWindow::advanceLevel() {
-    //Plays a sound before level advances
-    if (ui->cbSound->isChecked() && Game::instance()->CurrentLevel() < 5)
-    {
-    levelUp->play();
-    }
-
+void MainWindow::showCongrats()
+{
     //Setting up a label to inform the user that he has advanced to the next level. It will disappear after 3 seconds.
         congratsLabel = new QLabel(this);
     congratsLabel->setText("<font color='red'>Congratulations! You've advanced to the next level!</font>");
@@ -540,11 +577,25 @@ void MainWindow::advanceLevel() {
 
     connect(congratsLabelTimer, SIGNAL(timeout()),this, SLOT(hideMessage()));
     congratsLabelTimer->start(3000);
+}
+
+// lazy level implementation
+void MainWindow::advanceLevel() {
+    //Plays a sound before level advances
+    if (ui->cbSound->isChecked() && Game::instance()->CurrentLevel() < 5)
+    {
+    levelUp->play();
+    }
+
+    showCongrats();
 
     vector<Player*> players = Game::instance()->getPlayers();
     for (size_t i = 0; i < players.size(); i++)
     {
-        players[i]->setImmuneTimer(40);
+        if (players[i]->getImmuneTimer() >= 0)
+        {
+            players[i]->setImmuneTimer(40);
+        }
     }
 
     ++Game::instance()->CurrentLevel();
@@ -588,6 +639,15 @@ void MainWindow::advanceLevel() {
         }
     }
 
+    if (ui->rbServer->isChecked())
+    {
+        for (QObject *obj : server->children()) {
+            QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
+            if (anotherSock != nullptr) {
+                sendGameData(anotherSock);
+            }
+        }
+    }
 }
 
 void MainWindow::hideMessage()
@@ -605,7 +665,7 @@ void MainWindow::gotoMenu()
         for (QObject *obj : server->children()) {
             QTcpSocket *anotherSock = dynamic_cast<QTcpSocket*>(obj);
             if (anotherSock != nullptr) {
-                anotherSock->deleteLater();
+                anotherSock->disconnectFromHost();
             }
         }
         server->deleteLater();
@@ -721,7 +781,10 @@ void MainWindow::timerHit()
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
                     //setting the shot as false (player shot)
-                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
+                    double shotX = lblPlayer->x() + (lblPlayer->width() / 2) - 10;
+                    double shotY = lblPlayer->y() + (lblPlayer->height() / 2) - 10;
+                    updateCoords(shotX, shotY, 30, lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot(shotX, shotY, lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -737,7 +800,10 @@ void MainWindow::timerHit()
                 else if (ui->rbSingleplayer->isChecked())
                 {
                     //setting the shot as false (player shot)
-                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
+                    double shotX = lblPlayer->x() + (lblPlayer->width() / 2) - 10;
+                    double shotY = lblPlayer->y() + (lblPlayer->height() / 2) - 10;
+                    updateCoords(shotX, shotY, 30, lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot(shotX, shotY, lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -767,7 +833,7 @@ void MainWindow::timerHit()
                        {
                            riperinoPlayerino->play();
                        }
-                       if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lblPeerName->text()))
+                       if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                        {
                             QMessageBox::information(this, "", "You have been DESTROYED!");
                             gotoMenu();
@@ -798,7 +864,7 @@ void MainWindow::timerHit()
                          {
                              riperinoPlayerino->play();
                          }
-                         if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lblPeerName->text()))
+                         if (ui->rbClient->isChecked() && (lblPlayer->getPlayer()->getPeerName() == ui->lnPeerName->text()))
                          {
                               QMessageBox::information(this, "", "You have been DESTROYED!");
                               gotoMenu();

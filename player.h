@@ -40,6 +40,7 @@ public:
     QString getPeerName() { return peerName; }
     QString getPixmapName() { return pixmapName; }
     bool getImmunity() { return isImmune; }
+    int getImmuneTimer() { return immuneTimer; }
 
     void setRot(int rot) { rotation = rot; }
     void setAngle(int ang) { angle = ang; }

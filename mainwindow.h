@@ -26,6 +26,21 @@ namespace Ui {
 class MainWindow;
 }
 
+class ConnectionNames
+{
+    vector<QString> names;
+    vector<QString> addresses;
+    vector<quint16> ports;
+public:
+    explicit ConnectionNames() { }
+
+    QString getName(QString address, quint16 port);
+    void addRecord(QString name, QString address, quint16 port);
+    void deleteRecord(QString name);
+
+    ~ConnectionNames() { }
+};
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -41,6 +56,8 @@ class MainWindow : public QMainWindow
      QSound *levelUp = new QSound(":/images/levelAccomplished.wav");
      QTimer *congratsLabelTimer = new QTimer(this);
      QLabel *congratsLabel;
+
+     ConnectionNames *connectionNames;
 
     bool upKeyPressed = false;
     bool downKeyPressed = false;
@@ -68,6 +85,7 @@ public:
     void showGUI();
     void gotoMenu();
     QString shipSelect();
+    void showCongrats();
 
     void sendGameData(QTcpSocket *sock);
 
@@ -117,7 +135,6 @@ public:
 
     ~PlayerLabel()
     {
-        delete myPlayer;
         delete orig_pixmap;
     }
 
