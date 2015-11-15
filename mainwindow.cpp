@@ -206,7 +206,10 @@ void MainWindow::dataReceived()
                 }
                 if ((data[0] == "SHT") && (lblPlayer->getPlayer()->getPeerName() == data[1]))
                 {
-                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
+                    double shotX = lblPlayer->x() + (lblPlayer->width() / 2) - 10;
+                    double shotY = lblPlayer->y() + (lblPlayer->height() / 2) - 10;
+                    updateCoords(shotX, shotY, 30, lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot(shotX, shotY, lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -713,7 +716,10 @@ void MainWindow::timerHit()
                 else if (ui->rbServer->isChecked() && (lblPlayer->getPlayer()->getPeerName() == "serverPlayer"))
                 {
                     //setting the shot as false (player shot)
-                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
+                    double shotX = lblPlayer->x() + (lblPlayer->width() / 2) - 10;
+                    double shotY = lblPlayer->y() + (lblPlayer->height() / 2) - 10;
+                    updateCoords(shotX, shotY, 30, lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot(shotX, shotY, lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
@@ -729,7 +735,10 @@ void MainWindow::timerHit()
                 else if (ui->rbSingleplayer->isChecked())
                 {
                     //setting the shot as false (player shot)
-                    Game::instance()->addShot((lblPlayer->x() + (lblPlayer->width() / 2) - 10), (lblPlayer->y() + (lblPlayer->height() / 2) - 10), lblPlayer->getPlayer()->getRot(), false);
+                    double shotX = lblPlayer->x() + (lblPlayer->width() / 2) - 10;
+                    double shotY = lblPlayer->y() + (lblPlayer->height() / 2) - 10;
+                    updateCoords(shotX, shotY, 30, lblPlayer->getPlayer()->getRot());
+                    Game::instance()->addShot(shotX, shotY, lblPlayer->getPlayer()->getRot(), false);
 
                     ShotLabel *lblShot = new ShotLabel(ui->centralWidget);
 
