@@ -320,7 +320,7 @@ void MainWindow::resetGUI()
                             BossLabel *lblBoss = dynamic_cast<BossLabel *>(lbl);
                             if(lblBoss != nullptr)
                             {
-                                lblEnemy->deleteLater();
+                                lblBoss->deleteLater();
                             }
                         }
                     }
