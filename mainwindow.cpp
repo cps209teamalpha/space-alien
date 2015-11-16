@@ -362,13 +362,6 @@ void MainWindow::resetGUI()
         lblEnemy->setEnemy(enemies[i]);
         lblEnemy->enemyGen();
     }
-    vector<Boss*> bosses = Game::instance()->getBosses();
-    for (size_t i = 0; i < bosses.size(); i++) {
-        BossLabel *lblBoss = new BossLabel(ui->centralWidget);
-        lblBoss->setBoss(bosses.at(i));
-        QPixmap pixmap(":/images/mrj.png");
-        lblBoss->bossGen(pixmap);
-    }
 }
 
 void MainWindow::hideGUI()
@@ -1159,11 +1152,14 @@ void MainWindow::on_btnPlay_clicked()
             QMessageBox::critical(this, "Error", "Please specify name of server.");
             return;
         }
+        ui->btnPlay->setText("Connecting...");
         socket->connectToHost(hostname, 5000);
         if (!socket->waitForConnected())  {
             QMessageBox::critical(this, "Error", "Unable to connect to server.");
+            ui->btnPlay->setText("PLAY");
             return;
         }
+        ui->btnPlay->setText("PLAY");
         // Player set-up
         int immunity;
         if (ui->cbCheatMode->isChecked())
