@@ -72,25 +72,33 @@ void MainWindow::clientConnected()
     sock->waitForReadyRead();
     QString str = sock->readLine();
     vector<QString> initData = splitQString(str, ':');
-    qDebug() << "Client '" << initData[0] << "' connected from " << sock->peerAddress().toString() << endl;
-    connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
-    connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
-    int immunity;
-    if (ui->cbCheatMode->isChecked())
+    Player *player = Game::instance()->getPlayer(initData[0]);
+    if (player == nullptr)
     {
-        immunity = -1;
+        qDebug() << "Client '" << initData[0] << "' connected from " << sock->peerAddress().toString() << endl;
+        connect(sock, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+        connect(sock, SIGNAL(readyRead()), this, SLOT(dataReceived()));
+        int immunity;
+        if (ui->cbCheatMode->isChecked())
+        {
+            immunity = -1;
+        }
+        else
+        {
+            immunity = 40;
+        }
+        Game::instance()->addPlayer(380, 190, initData[0], immunity);
+        PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
+        lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
+        lblPlayer->getPlayer()->setPixmapName(":" + initData[1]);
+        lblPlayer->playerGen();
+        connectionNames->addRecord(initData[0], sock->peerAddress().toString(), sock->peerPort());
+        sendGameData(sock);
     }
     else
     {
-        immunity = 40;
+        sock->disconnectFromHost();
     }
-    Game::instance()->addPlayer(380, 190, initData[0], immunity);
-    PlayerLabel *lblPlayer = new PlayerLabel(ui->centralWidget);
-    lblPlayer->setPlayer(Game::instance()->getPlayer(initData[0]));
-    lblPlayer->getPlayer()->setPixmapName(":" + initData[1]);
-    lblPlayer->playerGen();
-    connectionNames->addRecord(initData[0], sock->peerAddress().toString(), sock->peerPort());
-    sendGameData(sock);
 }
 
 void MainWindow::clientDisconnected()
