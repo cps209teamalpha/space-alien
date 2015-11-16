@@ -1185,11 +1185,14 @@ void MainWindow::on_btnPlay_clicked()
             QMessageBox::critical(this, "Error", "Please specify name of server.");
             return;
         }
+        ui->btnPlay->setText("Connecting...");
         socket->connectToHost(hostname, 5000);
         if (!socket->waitForConnected())  {
             QMessageBox::critical(this, "Error", "Unable to connect to server.");
+            ui->btnPlay->setText("PLAY");
             return;
         }
+        ui->btnPlay->setText("PLAY");
         // Player set-up
         int immunity;
         if (ui->cbCheatMode->isChecked())
