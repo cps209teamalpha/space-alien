@@ -17,7 +17,6 @@
 
 #include "player.h"
 #include "alien.h"
-#include "boss.h"
 #include "game.h"
 #include "enemyspawn.h"
 #include "score.h"
@@ -160,26 +159,6 @@ public:
     }
 
     void alienGen(QPixmap pixmap);
-
-};
-
-class BossLabel : public QLabel
-{
-    Q_OBJECT
-
-    Boss *myBoss;
-
-public:
-    explicit BossLabel(QWidget *parent): QLabel(parent) { }
-    Boss *getBoss() const { return myBoss; }
-    void setBoss(Boss *boss) { myBoss = boss; }
-
-    ~BossLabel()
-    {
-        delete myBoss;
-    }
-
-    void bossGen(QPixmap pixmap);
 
 };
 

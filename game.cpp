@@ -57,14 +57,6 @@ void Game::addAlien(int rotation)
     nextAlien++;
 }
 
-void Game::addBoss() {
-    bosses.emplace_back(new Boss());
-}
-
-void Game::addBoss(double X, double Y) {
-    bosses.emplace_back(new Boss(X, Y));
-}
-
 // Wipes the current game and reinstantiates
 // all the member variables
 void Game::newGame()
@@ -73,7 +65,6 @@ void Game::newGame()
     aliens.clear();
     shots.clear();
     enemies.clear();
-    bosses.clear();
     score = 0;
     nextShot = 0;
     nextAlien = 0;
