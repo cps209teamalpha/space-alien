@@ -5,6 +5,10 @@ Score::Score()
 
 }
 
+void Score::add(std::size_t add) {
+
+}
+
 void Score::reset() {
 
 }

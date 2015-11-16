@@ -58,6 +58,7 @@ private:
     int numEnemy = 5;
 
     Highscores *highscores;
+    int score;
     // All the players in the game.
     // Normally one; if network support
     // is enabled, more will be added.
@@ -107,6 +108,8 @@ public:
     int getUntrackedShots() { return untrackedShots; }
 
     int getShotTimer() { return shotTimer; }
+
+    int &Score() { return score; }
 
     void addShot(int origX, int origY, int angle, bool isShotAlien)
     {
