@@ -362,13 +362,6 @@ void MainWindow::resetGUI()
         lblEnemy->setEnemy(enemies[i]);
         lblEnemy->enemyGen();
     }
-    vector<Boss*> bosses = Game::instance()->getBosses();
-    for (size_t i = 0; i < bosses.size(); i++) {
-        BossLabel *lblBoss = new BossLabel(ui->centralWidget);
-        lblBoss->setBoss(bosses.at(i));
-        QPixmap pixmap(":/images/mrj.png");
-        lblBoss->bossGen(pixmap);
-    }
 }
 
 void MainWindow::hideGUI()
