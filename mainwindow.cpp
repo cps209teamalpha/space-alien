@@ -317,14 +317,6 @@ void MainWindow::resetGUI()
                         {
                             lblEnemy->deleteLater();
                         }
-                        else
-                        {
-                            BossLabel *lblBoss = dynamic_cast<BossLabel *>(lbl);
-                            if(lblBoss != nullptr)
-                            {
-                                lblBoss->deleteLater();
-                            }
-                        }
                     }
                 }
             }
@@ -455,17 +447,6 @@ void PlayerLabel::playerGen()
 
     show();
     setFocus();
-}
-
-//Generates Mr. Jueckstock onto the window
-void BossLabel::bossGen(QPixmap pixmap)
-{
-    setGeometry(getBoss()->getX(), getBoss()->getY(), 139, 212);
-    setPixmap(pixmap);
-    setScaledContents(true);
-    setAttribute(Qt::WA_TranslucentBackground, true);
-
-    show();
 }
 
 void AlienLabel::alienGen(QPixmap pixmap)
@@ -606,39 +587,20 @@ void MainWindow::advanceLevel() {
     // consider moving the following lines into a function?
     // does the same thing as init
 
-    if(Game::instance()->CurrentLevel() >= 5) {
+    makeEnemies(Game::instance()->NumEnemy() * Game::instance()->CurrentLevel());
+    Game::instance()->addAlien(0);
+    Game::instance()->addAlien(90);
+    Game::instance()->addAlien(180);
+    Game::instance()->addAlien(270);
 
-        if (ui->cbSound->isChecked())
-        {
-            finalLevel->play();
-        }
-        Game::instance()->addBoss(50, 50);
+    vector<Alien*> aliens = Game::instance()->getAliens();
 
-        vector<Boss*> bosses = Game::instance()->getBosses();
-
-        for (size_t i = 0; i < bosses.size(); i++) {
-            BossLabel *lblBoss = new BossLabel(ui->centralWidget);
-            lblBoss->setBoss(bosses.at(i));
-            QPixmap pixmap(":/images/mrj.png");
-            lblBoss->bossGen(pixmap);
-        }
-    }
-    else {
-        makeEnemies(Game::instance()->NumEnemy() * Game::instance()->CurrentLevel());
-        Game::instance()->addAlien(0);
-        Game::instance()->addAlien(90);
-        Game::instance()->addAlien(180);
-        Game::instance()->addAlien(270);
-
-        vector<Alien*> aliens = Game::instance()->getAliens();
-
-        for (size_t i = 0; i < aliens.size(); i++)
-        {
-            AlienLabel *lblAlien = new AlienLabel(ui->centralWidget);
-            lblAlien->setAlien(aliens[i]);
-            QPixmap pixmap(":/images/alien1.png");
-            lblAlien->alienGen(pixmap);
-        }
+    for (size_t i = 0; i < aliens.size(); i++)
+    {
+        AlienLabel *lblAlien = new AlienLabel(ui->centralWidget);
+        lblAlien->setAlien(aliens[i]);
+        QPixmap pixmap(":/images/alien1.png");
+        lblAlien->alienGen(pixmap);
     }
 
     if (ui->rbServer->isChecked())

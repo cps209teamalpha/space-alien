@@ -18,7 +18,6 @@ SOURCES += main.cpp\
     player.cpp \
     enemyspawn.cpp \
     alien.cpp \
-    boss.cpp \
     score.cpp
 
 
@@ -27,7 +26,6 @@ HEADERS  += mainwindow.h \
     player.h \
     enemyspawn.h \
     alien.h \
-    boss.h \
     score.h
 
 FORMS    += mainwindow.ui
