@@ -6,9 +6,8 @@
 #include <fstream>
 
 #include "player.h"
-#include "alien.h"
-#include "boss.h"
 #include "enemyspawn.h"
+#include "alien.h"
 
 using namespace std;
 
@@ -66,8 +65,6 @@ private:
 
     vector<Alien*> aliens;
 
-    vector<Boss*> bosses;
-
     vector<Shot*> shots;
 
     vector<Enemy*> enemies;
@@ -91,9 +88,6 @@ public:
     int &NumEnemy() { return numEnemy; }
     int &CurrentLevel() { return currentLevel; }
     int getCurrentEnemies() { return (int)enemies.size(); }
-
-    void addBoss();
-    void addBoss(double, double);
 
     void addAlien(int rotation);
     void addNewAlien(int x, int y, int id, int rotation) { aliens.push_back(new Alien(x, y, id, rotation)); }
@@ -143,8 +137,6 @@ public:
     vector<Alien*> getAliens() { return aliens; }
 
     vector<Enemy*> getEnemies() { return enemies; }
-
-    vector<Boss*> getBosses() { return bosses; }
 
     // Methods to save/load game.
     // Reads file and instantiates member variables with the info
