@@ -514,7 +514,7 @@ background-color: rgb(255, 255, 255);</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">font-color: rgb(255, 0, 0);</string>
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>High Score</string>
@@ -530,7 +530,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
