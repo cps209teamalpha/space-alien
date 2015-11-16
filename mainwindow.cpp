@@ -278,6 +278,8 @@ void MainWindow::dataReceived()
 
 void MainWindow::resetGUI()
 {
+    Game::instance()->Score();
+
     // Clear playing field of UI elements:
     QObjectList objList = ui->centralWidget->children();
     for (QObject *lbl : objList)
@@ -684,6 +686,12 @@ void MainWindow::gotoMenu()
     showGUI();
 }
 
+void MainWindow::updateScore() {
+    int score = ui->lblScore->text().toInt();
+    score += Game::instance()->Score();
+    ui->lblScore->setText(QString::number(score));
+}
+
 //Performs different operations on each timer event
 void MainWindow::timerHit()
 {
@@ -963,6 +971,8 @@ void MainWindow::timerHit()
                        {
                            ripAsteroid->play();
                        }
+                       Game::instance()->Score() += 100;
+                       updateScore();
                        Game::instance()->deleteEnemy(test->getEnemy()->getID());
                        test->deleteLater();
                        Game::instance()->deleteShot(lblShot->getShot()->getID());
@@ -987,6 +997,8 @@ void MainWindow::timerHit()
                             {
                                 ripAsteroid->play();
                             }
+                            Game::instance()->Score() += 100;
+                            updateScore();
                             Game::instance()->deleteAlien(alienTest->getAlien()->getID());
                             alienTest->deleteLater();
                             Game::instance()->deleteShot(lblShot->getShot()->getID());

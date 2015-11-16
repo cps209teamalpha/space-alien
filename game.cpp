@@ -11,6 +11,7 @@ using namespace std;
 Game::Game()
 {
     highscores = new Highscores();
+    score = 0;
     nextShot = 0;
     nextAlien = 0;
     nextEnemy = 0;
@@ -73,11 +74,13 @@ void Game::newGame()
     shots.clear();
     enemies.clear();
     bosses.clear();
+    score = 0;
     nextShot = 0;
     nextAlien = 0;
     nextEnemy = 0;
     currentLevel = 1;
     untrackedShots = 0;
+
 }
 
 // Updates player & enemies, for use with a timer
