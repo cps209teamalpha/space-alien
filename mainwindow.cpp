@@ -286,8 +286,8 @@ void MainWindow::dataReceived()
 
 void MainWindow::resetGUI()
 {
-    Game::instance()->Score();
 
+    ui->lblScore->setText(0);
     // Clear playing field of UI elements:
     QObjectList objList = ui->centralWidget->children();
     for (QObject *lbl : objList)
